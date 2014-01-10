@@ -1,5 +1,6 @@
 from StringIO import StringIO
 import time
+import random
 
 from lxml import etree
 from bs4 import BeautifulSoup
@@ -8,7 +9,8 @@ import requests
 s = requests.Session()
 
 for i in range(5):
-    r = s.get('http://www.yelp.com/search?cflt=restaurants&find_loc=90025&start=' + str(10*i))
+    r = s.get('http://www.yelp.com/search?cflt=restaurants&find_loc=santa+monica&start=' + str(10*i))
+#    r = s.get('http://www.yelp.com/search?cflt=restaurants&find_loc=90025&start=' + str(10*i))
 #r = s.get('http://www.yelp.com/biz/kotoya-ramen-los-angeles-3')
     data = r.text
     soup = BeautifulSoup(data)
@@ -19,7 +21,5 @@ for i in range(5):
     for restaurant in restaurants:
         print "http://www.yelp.com" + restaurant
         
-    print '\n'
-    time.sleep(5)
+    time.sleep(random.uniform(2,7))
 
-#divs[68].span.a['href']
