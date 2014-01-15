@@ -77,5 +77,20 @@ neighborhoods = [
 "Citrus+Heights%2C+CA",
 ]
 
-for neighborhood in neighborhoods:
-    redis_db.add_to_group("neighborhoods", neighborhood)
+#for neighborhood in neighborhoods:
+#    redis_db.add_to_group("neighborhoods", neighborhood)
+
+print "DEBUG1"
+print len(redis_db.get_members("restaurant_searched"))
+count = 0
+for restaurant in redis_db.get_members("restaurant_searched"): 
+    count +=1
+    if count %100==0:
+        print count
+    matched_neighs = [neighborhood for neighborhood in neighborhoods if redis_db.is_member(neighborhood, restaurant)]
+    redis_db.add_info(restaurant, {"neighborhoods": matched_neighs})
+print "DEBUG2"
+for restaurant in redis_db.get_members("restaurant_to_search"):
+    matched_neighs = [neighborhood for neighborhood in neighborhoods if redis_db.is_member(neighborhood, restaurant)]
+    redis_db.add_info(restaurant, {"neighborhoods": matched_neighs})
+print "DEBUG3"

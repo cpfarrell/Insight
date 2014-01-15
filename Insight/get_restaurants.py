@@ -32,6 +32,13 @@ for neighborhood in redis_db.get_members("neighborhoods"):
                 if not redis_db.key_known(restaurant):
                     redis_db.add_key(restaurant)
                     redis_db.add_to_group("restaurant_to_search", restaurant)
+                rest_info = redis_db.get_info(restaurant)
+                neighborhoods = []
+                if "neighborhoods" in rest_info:
+                    neighborhoods = rest_info["neighborhoods"]
+                neighborhoods.append(neighborhood)
+                rest_info["neighborhoods"] = neighborhoods
+                redis_db.add_info(restaurant, rest_info)
         
             time.sleep(random.uniform(15,20))
 
