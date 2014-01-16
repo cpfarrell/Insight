@@ -3,6 +3,7 @@
 
 from lxml import etree
 from bs4 import BeautifulSoup
+import re
 
 import redis_database
 import sql_database
@@ -14,8 +15,8 @@ attrs = ['Alcohol', 'HasTV', 'NoiseLevel', 'RestaurantsAttire', 'BusinessAccepts
 db = sql_database.DbAccess('YELP', usr='root')
 db.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
 
-Columns = 'Site CHAR(100), Rating FLOAT, Favorites CHAR(200), RestaurantType CHAR(200), Latitude FLOAT, Longitude FLOAT, SimilarRest1 CHAR(100)'
-Columns += ', SimilarRest2 CHAR(100), SimilarRest3 CHAR(100)'
+Columns = 'Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200), Site CHAR(100), Rating FLOAT, Favorites CHAR(200)'
+Columns += ', RestaurantType CHAR(200), Latitude FLOAT, Longitude FLOAT, SimilarRest1 CHAR(100), SimilarRest2 CHAR(100), SimilarRest3 CHAR(100)'
 
 for attr in attrs:
     Columns += ', ' + attr + ' CHAR(80)'
@@ -26,6 +27,7 @@ count = 0
 for restaurant in redis_db.get_members("restaurant_searched"):
     count += 1
     if count%100==0:
+        print count
         db.commit()
 
     rest_info = redis_db.get_info(restaurant)
@@ -41,6 +43,37 @@ for restaurant in redis_db.get_members("restaurant_searched"):
     if len(bizRating)==0:
         continue
     new_info["Rating"] = bizRating[0].meta['content']
+
+    #Get name and address
+    h1s = soup.find_all("h1")
+    name = h1s[0].contents[0].strip()
+
+    #Just skip restaurants with chinese characters in their name because I don't feel like dealing with the encoding right now
+    if re.findall(ur'[\u4e00-\u9fff]+',name):
+        continue
+    spans = soup.find_all('span')
+
+    street = ""
+    streets = [span.contents for span in spans if span.get("itemprop")=="streetAddress"]
+    if len(streets)>0:
+        street = streets[0][0]
+
+    city = ""
+    cities = [span.contents for span in spans if span.get("itemprop")=="addressLocality"]
+    if len(cities)>0:
+        city = cities[0][0]
+
+    state = ""
+    states = [span.contents for span in spans if span.get("itemprop")=="addressRegion"]
+    if len(states)>0:
+        state = states[0][0]
+
+    zip = ""
+    zips = [span.contents for span in spans if span.get("itemprop")=="postalCode"]
+    if len(zips)>0:
+        zip = zips[0][0]
+
+    full_name = name + ' ' + street + ' ' + city + ', ' + state + ' ' + zip
 
     #Get ngrams from snippets
     review_snippets = [div for div in divs if div.get("class") and len(div.get("class"))>1 and div.get("class")[0]=="media-story" and div.get("class")[1]=="snippet"]
@@ -65,8 +98,8 @@ for restaurant in redis_db.get_members("restaurant_searched"):
 
     #Get the type of the restaurant
     bizInfo = [div for div in divs if div.get("id")=="bizInfoContent"]
-    spans = bizInfo[0].find_all('span')
-    category = [span for span in spans if span.get('id')=="cat_display"][0]
+    bizInfo_spans = bizInfo[0].find_all('span')
+    category = [span for span in bizInfo_spans if span.get('id')=="cat_display"][0]
     restaurant_type = [content.contents[0].lstrip() for content in category.contents if hasattr(content, 'contents')]
     new_info['restaurant_type'] = restaurant_type
 
@@ -89,11 +122,13 @@ for restaurant in redis_db.get_members("restaurant_searched"):
 
 
     #Now insert all this information into SQL
-    Values = 'INSERT INTO Restaurant (Site, Rating, Favorites, RestaurantType, Latitude, Longitude, SimilarRest1, SimilarRest2, SimilarRest3'
+    Values = 'INSERT INTO Restaurant (Name, Street, City, State, Zip, FullName, Site, Rating, Favorites, RestaurantType'
+    Values += ', Latitude, Longitude, SimilarRest1, SimilarRest2, SimilarRest3'
     for attr in attrs:
         Values += ', ' + attr
         
-    Values += ') VALUES ("' + restaurant + '", ' + bizRating[0].meta["content"] + ', "' + "---".join(ngrams) + '", "' + "---".join(restaurant_type) + '", '
+    Values += ') VALUES ("' + name + '", "' + street + '", "' + city + '", "' + state + '", "' + zip + '", "' + full_name + '", "' + restaurant + '", '
+    Values += bizRating[0].meta["content"] + ', "' + "---".join(ngrams) + '", "' + "---".join(restaurant_type) + '", '
     Values += lat + ', ' +  long + ', "' + rec_links[0] + '", "' + rec_links[1] + '", "' + rec_links[2]
 
     for attr in attrs:

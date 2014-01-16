@@ -20,7 +20,7 @@ def main():
        SELECT r1.RestaurantType as r1Type, r2.RestaurantType as r2Type, ABS(r1.RestaurantsPriceRange2 - r2.RestaurantsPriceRange2) as PriceDiff,
        ABS(r1.Rating - r2.Rating) as RatingDiff
        FROM Restaurant r1 JOIN Restaurant r2 ON r1.Site != r2.SimilarRest1 AND r1.Site != r2.SimilarRest2 AND r1.Site != r2.SimilarRest3 AND r1.Site != r2.Site
-       AND (r1.Latitude-r2.Latitude)*(r1.Latitude-r2.Latitude) < 0.000001 and (r1.Longitude-r2.Longitude)*(r1.Longitude-r2.Longitude) < 0.000001
+       AND DISTANCE(r1.Latitude, r1.Longitude, r2.Latitude, r2.Longitude) < 0.1
        ;''',db.cnx)
     df_nomatch['Match'] = np.zeros(len(df_nomatch))
 
