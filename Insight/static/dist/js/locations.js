@@ -48,9 +48,6 @@ function initialize(center) {
 }
       
 function createMarkerlist(){
-    //coordinates = document.getElementById("points").value
-    //coordinates = points.value
-    console.log("Coordinates " + coordinates)
     for (pair in coordinates) {
 	console.log("Latitude " + coordinates[pair]["Latitude"] + " Longitude " + coordinates[pair]["Longitude"])
 	restaurant_latlong.push(new google.maps.LatLng(coordinates[pair]["Latitude"], coordinates[pair]["Longitude"]))
@@ -63,7 +60,7 @@ function drop() {
         createMarkerlist()
         for (var i = 0; i < restaurant_latlong.length; i++) {
 	    setTimeout(function() {
-		    addMarker();
+		    addMarker(i);
 		}, i * 200);
         }
 }
@@ -74,7 +71,7 @@ function addMarker() {
 		    map: map,
 		    draggable: false,
 		    animation: google.maps.Animation.DROP,
-		    title:"Hello World"
+		    title:"Restaurant #" + (parseInt(iterator+1))
 		    }));
     iterator++;
     console.log("Adding markers.")
