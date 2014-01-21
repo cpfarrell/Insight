@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style type="text/css">
+<link href="static/dist/css/bootstrap.css" rel="stylesheet">
+<link href="static/dist/css/starter-template.css" rel="stylesheet">
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="starter-template">
+    <h1>Yoogle</h1>
+    <p class="lead">Search for new restaurants<br> based on others that you like.</p>
+</div>
+
+<div id="control_panel">
+  <div style="margin:40px;border-width:2px;">
+    <form autocomplete="on">
+      Find a restaurant like
+      <!--- Box where user inputs restaurant, has name restaurant_type --->
+      <input type="text" id="restaurant_name" placeholder="Restaurant" class="form-control" size="60">
+      <!--- <input id="restaurant_name" type="text" placeholder="Restaurant" size="30" autocomplete="on"> --->
+      with
+      <!--- Box where user inputs allowed distance, has name miles --->
+      <input id="miles" type="text" placeholder="Miles" size="10">
+      miles of
+      <!--- Box where user inputs zip code, has name zipcode --->
+      <input id="zipcode" type="text" placeholder="Zip Code" size="10">
+      <!--- Button which starts collection of data from above forms --->
+      <button type="button" id="find_button" href="maps">Search</button>
+      <!--- Text box which will hold the output restaurants once the id values are filled -->
+      <div id="points"></div>
+      <p class="lead" id="output_results"></p>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Search send (press enter) - jquery
+  // Wait til page load is ready
+  $(document).ready(function(){
+  console.log( "ready!" );
+  //When the button with id find_button is clicked then do these actions
+  $('#find_button').click(function() {
+  //Collect the values in the form fields with ids of restaurant_name, miles, and zipcode
+  var restaurant = $('#restaurant_name').val();
+  var miles = $('#miles').val();
+  var zipcode = $('#zipcode').val();
+  //Call the getRestaurant function in data.js with the input values
+  <!---getRestaurant(restaurant, zipcode, miles);--->
+  window.location.href = 'maps?restaurant='+restaurant+'&miles='+miles+'&zipcode='+zipcode
+  });
+  });
+</script>
+
+<!---
+<script>
+    $('#restaurant_name').typeahead({
+    name: 'restaurants',
+    //prefetch: '/q?restaurants=B',
+    remote: '/json/restaurants?q=%QUERY',
+    limit: 10
+  });
+</script>
+--->
+{% endblock %}
