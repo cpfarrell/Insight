@@ -1,0 +1,7 @@
+*~
+*.db
+*.rdb
+*.pyc
+docs/*
+BuildDatabase.py
+tutorials/
