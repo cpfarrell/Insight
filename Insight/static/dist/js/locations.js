@@ -10,24 +10,43 @@ var coordinates = []
 
 var restaurant_latlong = [];
 
+function readInfo(latitudes, longitudes) {
+    //var parsedJson = eval(info);
+    console.log(latitudes)
+    console.log(longitudes)
+    for (pair in parsedJson) {
+	names = names + (parseInt(pair)+1) + ". " + parsedJson[pair][pair][0] + "<br> " + parsedJson[pair][pair][1] + "<br>"
+	avg_latitude += parsedJson[pair][pair][2]
+	avg_longitude +=parsedJson[pair][pair][3]
+	coordinates.push({"Latitude": parsedJson[pair][pair][2], "Longitude": parsedJson[pair][pair][3]})
+	    }
+}
+
 // Javascript to get restaurant from page
 function getRestaurant(restaurant, zipcode, miles) {
     //Log inputs to console
-    console.log(("Input is restaurant = " + restaurant + ", miles = " + miles + " and zip = " + zipcode));
+    console.log(("Input is restaurant = " + restaurant + ", miles = " + miles + " and zipcode = " + zipcode));
     //Go to the page /restaurant (see drive_app.py) and pass in the arguments restaurant and zipcode
-    $.get('/restaurant?restaurant='+restaurant+'&miles='+miles+'&zip='+zipcode, function(result) {
+    $.get('/restaurant?restaurant='+restaurant+'&miles='+miles+'&zipcode='+zipcode, function(result) {
 	    //Log the output to console
 	    console.log("Output is = " + result);
 	    //Fill in the results that will go on the page
 	    //var parsedJson = $.getJSON(result)
 	    var parsedJson = eval(result);
+	    console.log(parsedJson)
 	    names = "<br>Top restaurants:<br>"
 	    coordinates = []
+	    avg_latitude = 0
+	    avg_longitude = 0
 	    for (pair in parsedJson) {
-		names = names + (parseInt(pair)+1) + ". " + parsedJson[pair][pair][0] + "<br>"
-		coordinates.push({"Latitude": parsedJson[pair][pair][1], "Longitude": parsedJson[pair][pair][2]})
+		names = names + (parseInt(pair)+1) + ". " + parsedJson[pair][pair][0] + "<br> " + parsedJson[pair][pair][1] + "<br>"
+		avg_latitude += parsedJson[pair][pair][2]
+		avg_longitude +=parsedJson[pair][pair][3]
+		coordinates.push({"Latitude": parsedJson[pair][pair][2], "Longitude": parsedJson[pair][pair][3]})
 	    }
-	    console.log("Coordinates1 " + coordinates)
+	    avg_latitude = avg_latitude/parsedJson.length
+            avg_longitude = avg_longitude/parsedJson.length
+	    google.maps.event.addDomListener(window, 'load', initialize(new google.maps.LatLng(avg_latitude, avg_longitude)));
 	    drop()
 	    $('#output_results').val(names);
 	    $('#output_results').html(names);
@@ -36,7 +55,10 @@ function getRestaurant(restaurant, zipcode, miles) {
 	});
 };
 
-var sf = new google.maps.LatLng(37.7771187, -122.4196396);
+function drawMaps(locations) {
+    google.maps.event.addDomListener(window, 'load', initialize(new google.maps.LatLng(avg_latitude, avg_longitude)));
+    drop()
+}
 
 function initialize(center) {
     geocoder = new google.maps.Geocoder();
@@ -96,4 +118,3 @@ function setAllMap(map) {
 	markers[i].setMap(map);
     }
 }
-google.maps.event.addDomListener(window, 'load', initialize(sf));

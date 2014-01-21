@@ -29,16 +29,22 @@ def get_reviews(soup):
     lis = soup.find_all("li")
     reviews = [li for li in lis if li.get("class") and li.get("class")[0]=='review']
 
-    for review in reviews:
+#    from code import interact; interact(local=locals())
+    for i, review in enumerate(reviews):
         ps = review.find_all("p")
-        texts.append(" ".join(([p for p in ps if p['class'][0]=='review_comment'][0].stripped_strings)))
+        comment = [p for p in ps if p['class'][0]=='review_comment']
+        #Catches reviews without any words
+        if len(comment)>0:
+            texts.append(" ".join(comment[0].stripped_strings))
+        #texts.append(" ".join(([p for p in ps if p['class'][0]=='review_comment'][0].stripped_strings)))
     return texts
 
 def clean_review(reviews):
     review = " ".join(reviews)
     review = ''.join(ch for ch in review if ch not in exclude).lower()
     review = review.split()
-    review = [stemmer.stem(word) for word in review if word not in sw]
+    #review = [stemmer.stem(word) for word in review if word not in sw]
+    review = [word for word in review if word not in sw]
     return " ".join(review)
 
 def main():
@@ -50,7 +56,7 @@ def main():
     db.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
 
     Columns = 'Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200), Site CHAR(100), Rating FLOAT, Favorites CHAR(200)'
-    Columns += ', RestaurantType CHAR(200), Latitude FLOAT, Longitude FLOAT, SimilarRest1 CHAR(100), SimilarRest2 CHAR(100), SimilarRest3 CHAR(100), Review TEXT'
+    Columns += ', RestaurantType CHAR(200), Latitude FLOAT, Longitude FLOAT, SimilarRest1 CHAR(100), SimilarRest2 CHAR(100), SimilarRest3 CHAR(100), NReviews INT, Review LONGTEXT'
 
     for attr in attrs:
         Columns += ', ' + attr + ' CHAR(80)'
@@ -65,6 +71,11 @@ def main():
             db.commit()
 
         rest_info = redis_db.get_info(restaurant)
+        n_reviews = rest_info['reviews']
+
+        if n_reviews < 40:
+            continue
+
         page = rest_info['yelp_page']
         soup = BeautifulSoup(page)
         divs = soup.find_all('div')
@@ -90,8 +101,8 @@ def main():
         street = get_address(spans, "streetAddress")
         city = get_address(spans, "addressLocality")
         state = get_address(spans, "addressRegion")
-        zip = get_address(spans, "postalCode")
-        full_name = name + ' ' + street + ' ' + city + ', ' + state + ' ' + zip
+        zipcode = get_address(spans, "postalCode")
+        full_name = name + ' ' + street + ' ' + city + ', ' + state + ' ' + zipcode
 
         #Get ngrams from snippets
         review_snippets = [div for div in divs if div.get("class") and len(div.get("class"))>1 and div.get("class")[0]=="media-story" and div.get("class")[1]=="snippet"]
@@ -140,17 +151,23 @@ def main():
 
         review = clean_review(get_reviews(soup)).encode('ascii',errors='ignore')
 
+        for i in range(1,5):
+            if ('yelp_page'+str(i)) in rest_info:
+                page = rest_info['yelp_page'+str(i)]
+                soup = BeautifulSoup(page)
+                review += clean_review(get_reviews(soup)).encode('ascii',errors='ignore')
+
         #Now insert all this information into SQL
         Values = 'INSERT INTO Restaurant (Name, Street, City, State, Zip, FullName, Site, Rating, Favorites, RestaurantType'
-        Values += ', Latitude, Longitude, SimilarRest1, SimilarRest2, SimilarRest3, Review'
+        Values += ', Latitude, Longitude, SimilarRest1, SimilarRest2, SimilarRest3, NReviews, Review'
         for attr in attrs:
             Values += ', ' + attr
         
-        Values += ') VALUES ("' + name + '", "' + street + '", "' + city + '", "' + state + '", "' + zip + '", "' + full_name + '", "' + restaurant + '", '
+        Values += ') VALUES ("' + name + '", "' + street + '", "' + city + '", "' + state + '", "' + zipcode + '", "' + full_name + '", "' + restaurant + '", '
         Values += bizRating[0].meta["content"] + ', "' + "---".join(ngrams) + '", "' + "---".join(restaurant_type) + '", '
         Values += lat.encode('utf-8') + ', ' +  long.encode('utf-8') + ', "'
-        Values += rec_links[0].encode('utf-8') + '", "' + rec_links[1].encode('utf-8') + '", "' + rec_links[2].encode('utf-8')  + '", "'
-        Values += review
+        Values += rec_links[0].encode('utf-8') + '", "' + rec_links[1].encode('utf-8') + '", "' + rec_links[2].encode('utf-8')  + '", '
+        Values += str(n_reviews) + ', "' + review
 
         for attr in attrs:
             if attr not in new_info:
