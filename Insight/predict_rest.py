@@ -83,7 +83,8 @@ def predict_rest(restaurant, miles, zipcode):
     restaurants = []
     for i in range(n_restaurants):
         print df.ix[i, 'max_words']
-        restaurants.append({i :(df.ix[i, 'r1Name'], (df.ix[i, 'max_words']), df.ix[i, 'Latitude'], df.ix[i, 'Longitude'])})
+        #restaurants.append({i :(df.ix[i, 'r1Name'], (df.ix[i, 'max_words']), df.ix[i, 'Latitude'], df.ix[i, 'Longitude'])})
+        restaurants.append({'Name' :df.ix[i, 'r1Name'], 'Words': df.ix[i, 'max_words'], 'Latitude': df.ix[i, 'Latitude'], 'Longitude': df.ix[i, 'Longitude']})
 
     print restaurants
     return restaurants
