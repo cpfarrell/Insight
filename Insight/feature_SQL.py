@@ -7,11 +7,12 @@ from lxml import etree
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
 import nltk
+import pymongo
+from pymongo import MongoClient
 
-import redis_database
 import sql_database
 
-redis_db = redis_database.RedisDatabase()
+client = MongoClient()
 exclude = set(string.punctuation)
 sw = set(stopwords.words('english'))
 stemmer = nltk.PorterStemmer()
@@ -48,29 +49,30 @@ def clean_review(reviews):
     return " ".join(review)
 
 def main():
-    redis_db = redis_database.RedisDatabase()
+    db_mongo = client.yelp_database
+    posts = db_mongo.posts
+    rests_info = posts.find()
 
     attrs = ['Alcohol', 'HasTV', 'NoiseLevel', 'RestaurantsAttire', 'BusinessAcceptsCreditCards', 'Ambience', 'RestaurantsGoodForGroups', 'Caters', 'WiFi', 'RestaurantsReservations', 'RestaurantsTakeOut', 'GoodForKids', 'WheelchairAccessible', 'RestaurantsTableService', 'OutdoorSeating', 'RestaurantsPriceRange2', 'RestaurantsDelivery', 'GoodForMeal', 'BusinessParking']
 
-    db = sql_database.DbAccess('YELP', usr='root')
-    db.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
+    db_sql = sql_database.DbAccess('YELP', usr='root')
+    db_sql.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
 
-    Columns = 'Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200), Site CHAR(100), Rating FLOAT, Favorites CHAR(200)'
+    Columns = 'Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200), Phone CHAR(50) Site CHAR(100), Rating FLOAT, Favorites CHAR(200)'
     Columns += ', RestaurantType CHAR(200), Latitude FLOAT, Longitude FLOAT, SimilarRest1 CHAR(100), SimilarRest2 CHAR(100), SimilarRest3 CHAR(100), NReviews INT, Review LONGTEXT'
 
     for attr in attrs:
         Columns += ', ' + attr + ' CHAR(80)'
 
-    db.cursor.execute('CREATE TABLE Restaurant (' + Columns + ');')
+    db_sql.cursor.execute('CREATE TABLE Restaurant (' + Columns + ');')
 
     count = 0
-    for restaurant in redis_db.get_members("restaurant_searched"):
+    for rest_info in rests_info:
         count += 1
         if count%100==0:
             print count
-            db.commit()
+            db_sql.commit()
 
-        rest_info = redis_db.get_info(restaurant)
         n_reviews = rest_info['reviews']
 
         if n_reviews < 40:
@@ -78,6 +80,12 @@ def main():
 
         page = rest_info['yelp_page']
         soup = BeautifulSoup(page)
+
+        links = soup.find_all('link')
+        href = links[0]['href']
+        restaurant = href[href.find('biz')-1:]
+        print restaurant
+
         divs = soup.find_all('div')
 
         new_info = {}
@@ -98,6 +106,8 @@ def main():
             continue
         spans = soup.find_all('span')
 
+        telephone = get_address(spans, "telephone")
+        print telephone
         street = get_address(spans, "streetAddress")
         city = get_address(spans, "addressLocality")
         state = get_address(spans, "addressRegion")
@@ -158,12 +168,12 @@ def main():
                 review += clean_review(get_reviews(soup)).encode('ascii',errors='ignore')
 
         #Now insert all this information into SQL
-        Values = 'INSERT INTO Restaurant (Name, Street, City, State, Zip, FullName, Site, Rating, Favorites, RestaurantType'
+        Values = 'INSERT INTO Restaurant (Name, Street, City, State, Zip, FullName, Phone, Site, Rating, Favorites, RestaurantType'
         Values += ', Latitude, Longitude, SimilarRest1, SimilarRest2, SimilarRest3, NReviews, Review'
         for attr in attrs:
             Values += ', ' + attr
         
-        Values += ') VALUES ("' + name + '", "' + street + '", "' + city + '", "' + state + '", "' + zipcode + '", "' + full_name + '", "' + restaurant + '", '
+        Values += ') VALUES ("' + name + '", "' + street + '", "' + city + '", "' + state + '", "' + zipcode + '", "' + full_name + '", "' + telephone + '", "' + restaurant + '", '
         Values += bizRating[0].meta["content"] + ', "' + "---".join(ngrams) + '", "' + "---".join(restaurant_type) + '", '
         Values += lat.encode('utf-8') + ', ' +  long.encode('utf-8') + ', "'
         Values += rec_links[0].encode('utf-8') + '", "' + rec_links[1].encode('utf-8') + '", "' + rec_links[2].encode('utf-8')  + '", '
@@ -180,10 +190,10 @@ def main():
             Columns += ', ' + attr + ' CHAR(80)'
 
         Values += ';'
-        db.cursor.execute(Values)
+        db_sql.cursor.execute(Values)
 
-    db.commit()
-    db.close()
+    db_sql.commit()
+    db_sql.close()
 
 if __name__ == '__main__':
     main()
