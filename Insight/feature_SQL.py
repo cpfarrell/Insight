@@ -51,7 +51,7 @@ def clean_review(reviews):
 def get_restaurant(soup):
     links = soup.find_all('link')
     for link in links:
-        href = links[0]['href']
+        href = link['href']
         if href.find('biz')!=-1:
             return href[href.find('biz')-1:]
 
