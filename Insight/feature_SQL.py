@@ -67,7 +67,7 @@ def main():
     db_sql = sql_database.DbAccess('YELP', usr='root')
     db_sql.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
 
-    Columns = 'Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200), Phone CHAR(50) Site CHAR(100), Rating FLOAT, Favorites CHAR(200)'
+    Columns = 'Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200), Phone CHAR(50), Site CHAR(100), Rating FLOAT, Favorites CHAR(200)'
     Columns += ', RestaurantType CHAR(200), Latitude FLOAT, Longitude FLOAT, SimilarRest1 CHAR(100), SimilarRest2 CHAR(100), SimilarRest3 CHAR(100), NReviews INT, Review LONGTEXT'
 
     for attr in attrs:
@@ -91,7 +91,6 @@ def main():
         soup = BeautifulSoup(page)
 
         restaurant = get_restaurant(soup)
-        print restaurant
 
         divs = soup.find_all('div')
 
@@ -114,7 +113,6 @@ def main():
         spans = soup.find_all('span')
 
         telephone = get_address(spans, "telephone")
-        print telephone
         street = get_address(spans, "streetAddress")
         city = get_address(spans, "addressLocality")
         state = get_address(spans, "addressRegion")
