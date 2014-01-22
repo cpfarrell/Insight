@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1" />
     <link rel="shortcut icon" href="static/docs-assets/ico/favicon.png">
 
     <title>Starter Template for Bootstrap</title>
@@ -35,8 +36,8 @@
       margin: 0px;
       padding: 0px
       }
-      #map-canvas { height: 100%; margin: 25px; float: right; width: 80% }
-      #output_results { height: 100%; margin: 0px; float: left; width: 45% }
+
+      {% block style %}{% endblock %}
     </style>
 
     <script type="text/javascript"
@@ -79,24 +80,6 @@
     <script src="static/dist/js/bootstrap.min.js"></script>
     <script src="static/dist/js/locations.js"></script>
     <script src="static/dist/js/typeahead.min.js"></script>
-<!---
-    <script>
-    // Search send (press enter) - jquery
-    // Wait til page load is ready
-    $(document).ready(function(){
-      console.log( "ready!" );
-      //When the button with id find_button is clicked then do these actions
-      $('#find_button').click(function() {
-         //Collect the values in the form fields with ids of restaurant_name, miles, and zipcode
-         var restaurant = $('#restaurant_name').val();
-         var miles = $('#miles').val();
-         var zipcode = $('#zipcode').val();
-         //Call the getRestaurant function in data.js with the input values
-         getRestaurant(restaurant, zipcode, miles);
-      });
-    });
-  </script>
---->
 
   <script>
     $('#restaurant_name').typeahead({

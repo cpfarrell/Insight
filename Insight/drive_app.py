@@ -16,6 +16,8 @@ db = sql_database.DbAccess('YELP', usr='root')
 app = Flask(__name__)
 app.debug = True
 
+similar = {}
+
 @app.route("/")
 def hello():
     return render_template('home.html')
@@ -25,21 +27,30 @@ def maps():
     restaurant = request.args.get('restaurant', '')
     miles = request.args.get('miles', '')
     zipcode = request.args.get('zipcode', '')
+    return render_template('maps.html', restaurant=restaurant, miles=miles, zipcode=zipcode)
+
+@app.route("/test2")
+def testing():
+    restaurant = request.args.get('restaurant', '')
+    miles = request.args.get('miles', '')
+    zipcode = request.args.get('zipcode', '')
     predict = predict_rest.predict_rest(restaurant, miles, zipcode)
+    names = [rest[i][0] for i, rest in enumerate(predict)]
+    items = [rest[i][1] for i, rest in enumerate(predict)]
     latitudes = [rest[i][2] for i, rest in enumerate(predict)]
     longitudes = [rest[i][3] for i, rest in enumerate(predict)]
-    return render_template('maps.html', latitudes=latitudes, longitudes=longitudes)
+    return render_template('maps.html', names=names, items=items, latitudes=latitudes, longitudes=longitudes)
 
 @app.route("/restaurant")
-def restaurant():
+def restaurant(new = False):
     #Get input arguments
     restaurant = request.args.get('restaurant', '')
     miles = request.args.get('miles', '')
     zipcode = request.args.get('zipcode', '')
-    return predict_rest.predict_rest(restaurant, miles, zipcode)
+    if (restaurant, miles, zipcode) not in similar:
+        return json.dumps(predict_rest.predict_rest(restaurant, miles, zipcode))
 
 def list_restaurants():
-
     q = request.args.get('q')
     # This is my query to find cities, countries matching query
     sql = ("SELECT FullName FROM Restaurant WHERE FullName LIKE '{0}%' LIMIT 10").format(q)
