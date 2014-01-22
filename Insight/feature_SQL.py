@@ -48,6 +48,15 @@ def clean_review(reviews):
     review = [word for word in review if word not in sw]
     return " ".join(review)
 
+def get_restaurant(soup):
+    links = soup.find_all('link')
+    for link in links:
+        href = links[0]['href']
+        if href.find('biz')!=-1:
+            return href[href.find('biz')-1:]
+
+    return "An error has occurred"
+
 def main():
     db_mongo = client.yelp_database
     posts = db_mongo.posts
@@ -81,9 +90,7 @@ def main():
         page = rest_info['yelp_page']
         soup = BeautifulSoup(page)
 
-        links = soup.find_all('link')
-        href = links[0]['href']
-        restaurant = href[href.find('biz')-1:]
+        restaurant = get_restaurant(soup)
         print restaurant
 
         divs = soup.find_all('div')
