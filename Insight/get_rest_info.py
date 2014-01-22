@@ -25,10 +25,6 @@ while redis_db.num_members("restaurant_to_search") > 0:
     rest_info = {'restaurant': rest_url}
     data_rest = rest.text
 
-
-    redis_db.add_to_group("restaurant_searched", rest_url)
-    redis_db.remove_member("restaurant_to_search", rest_url)
-
     soup_rest = BeautifulSoup(data_rest)
     divs_rest = soup_rest.find_all('div')
 
@@ -67,4 +63,6 @@ while redis_db.num_members("restaurant_to_search") > 0:
         print 'No menu found'
 
     posts.insert(rest_info)
+    redis_db.add_to_group("restaurant_searched", rest_url)
+    redis_db.remove_member("restaurant_to_search", rest_url)
     time.sleep(random.uniform(10,15))
