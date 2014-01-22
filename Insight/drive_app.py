@@ -16,8 +16,6 @@ db = sql_database.DbAccess('YELP', usr='root')
 app = Flask(__name__)
 app.debug = True
 
-similar = {}
-
 @app.route("/")
 def hello():
     return render_template('home.html')
@@ -29,26 +27,13 @@ def maps():
     zipcode = request.args.get('zipcode', '')
     return render_template('maps.html', restaurant=restaurant, miles=miles, zipcode=zipcode)
 
-@app.route("/test2")
-def testing():
-    restaurant = request.args.get('restaurant', '')
-    miles = request.args.get('miles', '')
-    zipcode = request.args.get('zipcode', '')
-    predict = predict_rest.predict_rest(restaurant, miles, zipcode)
-    names = [rest[i][0] for i, rest in enumerate(predict)]
-    items = [rest[i][1] for i, rest in enumerate(predict)]
-    latitudes = [rest[i][2] for i, rest in enumerate(predict)]
-    longitudes = [rest[i][3] for i, rest in enumerate(predict)]
-    return render_template('maps.html', names=names, items=items, latitudes=latitudes, longitudes=longitudes)
-
 @app.route("/restaurant")
-def restaurant(new = False):
+def restaurant():
     #Get input arguments
     restaurant = request.args.get('restaurant', '')
     miles = request.args.get('miles', '')
     zipcode = request.args.get('zipcode', '')
-    if (restaurant, miles, zipcode) not in similar:
-        return json.dumps(predict_rest.predict_rest(restaurant, miles, zipcode))
+    return json.dumps(predict_rest.predict_rest(restaurant, miles, zipcode))
 
 def list_restaurants():
     q = request.args.get('q')
@@ -58,16 +43,15 @@ def list_restaurants():
     # Matching cities are in a list
     restaurants = [restaurant[0] for restaurant in db.cursor.fetchall()]
     # Python list is converted to JSON string
-    print restaurants
     return json.dumps(restaurants)
-
-@app.route('/<pagename>')
-def regularpage(pagename=None):
-    return "The page " + pagename + " does not exist"
 
 @app.route("/json/<what>")
 def ajson(what):
     return list_restaurants()
+
+@app.route('/<pagename>')
+def regularpage(pagename=None):
+    return "The page " + pagename + " does not exist"
 
 if __name__ == "__main__":
     app.run()
