@@ -11,6 +11,7 @@ var restaurant_latlong = [];
 var parsedJson;
 
 var infowindow = new google.maps.InfoWindow();
+var map;
 
 // Javascript to get restaurant from page
 function getRestaurant(restaurant, zipcode, miles) {
@@ -30,20 +31,34 @@ function getRestaurant(restaurant, zipcode, miles) {
 		//coordinates = []
 	    avg_latitude = 0
 	    avg_longitude = 0
-	    count = 0
 	    console.log(parsedJson.length)
+	    min_lat = 999999.
+	    max_lat = -999999.
+	    min_long = 999999.
+	    max_long = -999999.
+	    console.log(parsedJson.length)
+	    if (parsedJson.length==0) {
+		$('#output_results').val("No restaurants found. Please increase radius or search in a supported city");
+		$('#output_results').html("No restaurants found. Please increase radius or search in a supported city");
+		return result
+	    }
+
 	    for(var i = 0; i < parsedJson.length; i++) {
-		//for (pair in parsedJson) {
 		names = names + (parseInt(i)+1) + ". " + parsedJson[i]['Name'] + "<br>"
-		console.log("Latitude " + parsedJson[i]['Latitude'])
+		if (parsedJson[i]['Latitude'] < min_lat) {min_lat = parsedJson[i]['Latitude']}
+		if (parsedJson[i]['Latitude'] > max_lat) {max_lat = parsedJson[i]['Latitude']}
+		if (parsedJson[i]['Longitude'] < min_long) {min_long = parsedJson[i]['Longitude']}
+		if (parsedJson[i]['Longitude'] > max_long) {max_long = parsedJson[i]['Longitude']}
 		avg_latitude += parsedJson[i]['Latitude']
 		avg_longitude +=parsedJson[i]['Longitude']
-		count += 1
 	    }
-	    avg_latitude = avg_latitude/count
-            avg_longitude = avg_longitude/count
+	    avg_latitude = avg_latitude/parsedJson.length
+            avg_longitude = avg_longitude/parsedJson.length
 	    console.log(avg_latitude + " " + avg_longitude)
-	    google.maps.event.addDomListener(window, 'load', initialize(new google.maps.LatLng(avg_latitude, avg_longitude)));
+	    map.setCenter(new google.maps.LatLng(avg_latitude, avg_longitude));
+	    var bounds = new google.maps.LatLngBounds(new google.maps.LatLng(min_lat, min_long),new google.maps.LatLng(max_lat, max_long));
+	    map.fitBounds(bounds);
+
 	    drop()
 	    $('#output_results').val(names);
 	    $('#output_results').html(names);
@@ -60,7 +75,7 @@ function drawMaps(locations) {
 function initialize(center) {
     geocoder = new google.maps.Geocoder();
     var mapOptions = {
-	center: center,
+	center: new google.maps.LatLng(37.7712, -122.4413),
 	zoom: 13
     }
     map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
@@ -69,11 +84,10 @@ function initialize(center) {
 function createMarkerlist(){
     console.log("Creating markers")
     console.log(parsedJson.length)
-    for(var i = 0; i < parsedJson.length; i++) {
-	//for (pair in parsedJson) {
-	console.log("Latitude " + parsedJson[i]["Latitude"] + " Longitude " + parsedJson[i]["Lxongitude"])
-	restaurant_latlong.push(new google.maps.LatLng(parsedJson[i]["Latitude"], parsedJson[i]["Longitude"]))
-    }
+	//for(var i = 0; i < parsedJson.length; i++) {
+	//console.log("Latitude " + parsedJson[i]["Latitude"] + " Longitude " + parsedJson[i]["Lxongitude"])
+	    //restaurant_latlong.push(new google.maps.LatLng(parsedJson[i]["Latitude"], parsedJson[i]["Longitude"]))
+	//}
     console.log("Creating new Marker List")
 	}
       
@@ -88,13 +102,15 @@ function drop() {
 
 function addMarker() {
     var html = '<div id="infowindow">';
-    html += "Name: " + parsedJson[iterator]["Name"] + "<br>Most similar items: " + parsedJson[iterator]["Words"]
+    html += parsedJson[iterator]["Name"] + "<br>" + parsedJson[iterator]["Street"] + "<br>" + parsedJson[iterator]["City"] + "<br>"
+    html += "<a href=http://www.yelp.com" + parsedJson[iterator]["Site"] + " target='_blank'>See on yelp</a>"
+    html += "<br><br>Most similar items: " + parsedJson[iterator]["Words"]
     html +='</div>';
     var image = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld='+parseInt(iterator+1) + '|FE6256|000000';
     console.log(image)
     var marker = new google.maps.Marker({
-	    //position: new google.maps.LatLng(parsedJson[iterator]["Latitude"], parsedJson[iterator]["Longitude"]),
-	    position: restaurant_latlong[iterator],
+	    position: new google.maps.LatLng(parsedJson[iterator]["Latitude"], parsedJson[iterator]["Longitude"]),
+	    //position: restaurant_latlong[iterator],
 	    map: map,
 	    draggable: false,
 	    icon: image,
@@ -130,3 +146,4 @@ function setAllMap(map) {
 	markers[i].setMap(map);
     }
 }
+google.maps.event.addDomListener(window, 'load', initialize);
