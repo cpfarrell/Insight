@@ -127,6 +127,9 @@ for user in norcal_users:
             for socal_rest in socal_users[user]:
                 rows.append(build_row(user, norcal_rest, socal_rest))
 
+f = open('data/commenters.txt', 'w')
+f.write(str(rows))
+
 df = pandas.DataFrame.from_records(rows)
 df = helper.transform(df)
 X = helper.BuildX(df)
