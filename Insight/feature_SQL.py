@@ -10,7 +10,7 @@ import nltk
 import pymongo
 from pymongo import MongoClient
 
-import sql_database
+#import sql_database
 
 client = MongoClient()
 exclude = set(string.punctuation)
@@ -30,21 +30,20 @@ def get_reviews(soup):
     lis = soup.find_all("li")
     reviews = [li for li in lis if li.get("class") and li.get("class")[0]=='review']
 
-#    from code import interact; interact(local=locals())
     for i, review in enumerate(reviews):
         ps = review.find_all("p")
         comment = [p for p in ps if p['class'][0]=='review_comment']
         #Catches reviews without any words
         if len(comment)>0:
             texts.append(" ".join(comment[0].stripped_strings))
-        #texts.append(" ".join(([p for p in ps if p['class'][0]=='review_comment'][0].stripped_strings)))
     return texts
 
 def clean_review(reviews):
-    review = " ".join(reviews)
-    review = ''.join(ch for ch in review if ch not in exclude).lower()
+#    review = " ".join(reviews)
+    reviews = [' newsentencebegin '.join(sent for sent in nltk.sent_tokenize(review)) for review in reviews]
+    reviews = [''.join(ch for ch in review if ch not in exclude and not ch.isdigit() and ord(ch)<126).lower() for review in reviews]
+    review = " NEWREVIEW ".join(reviews)
     review = review.split()
-    #review = [stemmer.stem(word) for word in review if word not in sw]
     review = [word for word in review if word not in sw]
     return " ".join(review)
 
@@ -64,8 +63,8 @@ def main():
 
     attrs = ['Alcohol', 'HasTV', 'NoiseLevel', 'RestaurantsAttire', 'BusinessAcceptsCreditCards', 'Ambience', 'RestaurantsGoodForGroups', 'Caters', 'WiFi', 'RestaurantsReservations', 'RestaurantsTakeOut', 'GoodForKids', 'WheelchairAccessible', 'RestaurantsTableService', 'OutdoorSeating', 'RestaurantsPriceRange2', 'RestaurantsDelivery', 'GoodForMeal', 'BusinessParking']
 
-    db_sql = sql_database.DbAccess('YELP', usr='root')
-    db_sql.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
+    #db_sql = sql_database.DbAccess('YELP', usr='root')
+    #db_sql.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
 
     Columns = 'Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200), Phone CHAR(50), Site CHAR(100), Rating FLOAT, Favorites CHAR(200)'
     Columns += ', RestaurantType CHAR(200), Latitude FLOAT, Longitude FLOAT, SimilarRest1 CHAR(100), SimilarRest2 CHAR(100), SimilarRest3 CHAR(100), NReviews INT, Review LONGTEXT'
@@ -73,14 +72,14 @@ def main():
     for attr in attrs:
         Columns += ', ' + attr + ' CHAR(80)'
 
-    db_sql.cursor.execute('CREATE TABLE Restaurant (' + Columns + ');')
+    #db_sql.cursor.execute('CREATE TABLE Restaurant (' + Columns + ');')
 
     count = 0
     for rest_info in rests_info:
         count += 1
         if count%100==0:
             print count
-            db_sql.commit()
+            #db_sql.commit()
 
         n_reviews = rest_info['reviews']
 
@@ -195,10 +194,10 @@ def main():
             Columns += ', ' + attr + ' CHAR(80)'
 
         Values += ';'
-        db_sql.cursor.execute(Values)
+        #db_sql.cursor.execute(Values)
 
-    db_sql.commit()
-    db_sql.close()
+    #db_sql.commit()
+    #db_sql.close()
 
 if __name__ == '__main__':
     main()
