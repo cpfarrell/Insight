@@ -103,7 +103,7 @@ function drop() {
 function addMarker() {
     var html = '<div id="infowindow">';
     html += parsedJson[iterator]["Name"] + "<br>" + parsedJson[iterator]["Street"] + "<br>" + parsedJson[iterator]["City"] + "<br>"
-    html += "<a href=http://www.yelp.com" + parsedJson[iterator]["Site"] + " target='_blank'>See on yelp</a>"
+    html += parsedJson[iterator]["Phone"] + "<br><a href=http://www.yelp.com" + parsedJson[iterator]["Site"] + " target='_blank'>See on yelp</a>"
     html += "<br><br>Most similar items: " + parsedJson[iterator]["Words"]
     html +='</div>';
     var image = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld='+parseInt(iterator+1) + '|FE6256|000000';
