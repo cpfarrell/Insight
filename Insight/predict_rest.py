@@ -15,19 +15,19 @@ import helper
 import sql_database
 db = sql_database.DbAccess('YELP', usr='root')
 
-stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcombiz']
+stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcombiz', 'food', 'place']
 
-n_restaurants = 3
+n_restaurants = 5
 
 def tf_idf(df, r1Reviews, r2Review):
     Reviews = r1Reviews
     Reviews.append(r2Review)
     Reviews = [Review[1] for Review in Reviews]
 
-    vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=1.0, stop_words='english', ngram_range=(1,3))
+    vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=1.0, stop_words='english', ngram_range=(1,2))
     r2_ngrams = vectorizer.fit(r2Review).get_feature_names()
 
-    vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=1.0, stop_words=stop_words, ngram_range=(1,3), vocabulary=r2_ngrams)
+    vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=1.0, stop_words=stop_words, ngram_range=(1,2), vocabulary=r2_ngrams)
     tfidf_counts = vectorizer.fit_transform(Reviews)
     r2 = tfidf_counts[-1,:]
     r1 = tfidf_counts[range(tfidf_counts.shape[0]-1),:]
@@ -38,10 +38,15 @@ def tf_idf(df, r1Reviews, r2Review):
     lengths = r1.sum(axis=1)
     similarity = np.divide(cosine, lengths).A1
 
-    max_indices = product.argmax(axis=1)
-    max_words = [r2_ngrams[idx] for idx in max_indices.A1]
+    #max_indices = product.argmax(axis=1)
+    product_sort = product.argsort(axis=1)
+    max_words = [r2_ngrams[idx] for idx in product_sort[:,-1].A1]
+    max_words2 = [r2_ngrams[idx] for idx in product_sort[:,-2].A1]
+    max_words3 = [r2_ngrams[idx] for idx in product_sort[:,-3].A1]
 
     df['max_words'] = max_words
+    df['max_words2'] = max_words2
+    df['max_words3'] = max_words3
     df['similarity'] = similarity
     df = df.sort('similarity', ascending=False).reset_index()
 
@@ -50,15 +55,17 @@ def tf_idf(df, r1Reviews, r2Review):
 def predict_rest(restaurant, miles, zipcode):
     df = pandas.io.sql.read_frame('''
      SELECT r1.Name as r1Name, r1.FullName as r1FullName, r1.RestaurantType as r1Type, r1.Site as r1Site, 
+     r1.Street as r1Street, r1.City as r1City, r1.State as r1State, r1.Zip as r1Zip, r1.Phone as r1Phone,
      r2.RestaurantType as r2Type, ABS(r1.RestaurantsPriceRange2 - r2.RestaurantsPriceRange2) as PriceDiff,
      ABS(r1.Rating - r2.Rating) as RatingDiff, r1.Latitude as Latitude, r1.Longitude as Longitude, r1.GoodForMeal=r2.GoodForMeal as MealSame,
      r1.RestaurantsTableService=r2.RestaurantsTableService as TableSame, r1.Favorites as r1Food, r2.Favorites as r2Food '''
-     #, r1.Review as r1Review, r2.Review as r2Review
      '''FROM Restaurant r1 JOIN ZipCodes
-     ON DISTANCE(ZipCodes.Latitude, ZipCodes.Longitude, r1.Latitude, r1.Longitude) < ''' + miles + '''
-     CROSS JOIN Restaurant r2
+     ON DISTANCE(ZipCodes.Latitude, ZipCodes.Longitude, r1.Latitude, r1.Longitude) < ''' + miles + ''' CROSS JOIN Restaurant r2
      WHERE (r2.FullName = "''' + restaurant + '''" OR r2.Site = "''' + restaurant + '''") AND ZipCodes.Zip = ''' + zipcode + ''' AND r1.NReviews > 100;'''
                                   , db.cnx)
+
+    if len(df)==0:
+        return []
 
     df = helper.transform(df)
 
@@ -67,7 +74,7 @@ def predict_rest(restaurant, miles, zipcode):
     logistic = joblib.load("data/logit.joblib.pkl")
     df['scores'] = logistic.decision_function(X)
     df = df.sort('scores', ascending=False).reset_index()
-    df = df.ix[range(30),:]
+    df = df.ix[range(50),:]
     #df=df.ix[df['scores']>4]
 
     #Sort by name to keep aligned
@@ -86,12 +93,12 @@ def predict_rest(restaurant, miles, zipcode):
 
     restaurants = []
     for i in range(n_restaurants):
-        restaurants.append({'Name' :df.ix[i, 'r1Name'], 'Words': df.ix[i, 'max_words'], 'Site': df.ix[i, 'r1Site'], 
-                            'Latitude': df.ix[i, 'Latitude'], 'Longitude': df.ix[i, 'Longitude']})
+        restaurants.append({'Name' :df.ix[i, 'r1Name'], 'Words': (df.ix[i, 'max_words'] + ', ' + df.ix[i, 'max_words2'] + ', ' + df.ix[i, 'max_words3']),
+                            'Street': df.ix[i, 'r1Street'], 'City': df.ix[i, 'r1City'] + ', ' + df.ix[i, 'r1State'] + ' ' + df.ix[i, 'r1Zip'],
+                            'Site': df.ix[i, 'r1Site'], 'Latitude': df.ix[i, 'Latitude'], 'Longitude': df.ix[i, 'Longitude']})
 
-    #print restaurants
     return restaurants
 
 if __name__=='__main__':
-    predict_rest("Kotoya Ramen 11901 Santa Monica Blvd Los Angeles, CA 90025", "10", "94117")
+    print predict_rest("Kotoya Ramen 11901 Santa Monica Blvd Los Angeles, CA 90025", "10", "33618")
 #    print predict_rest("/biz/tender-greens-hollywood", "5", "95135")
