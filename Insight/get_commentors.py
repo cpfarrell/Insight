@@ -72,10 +72,11 @@ for rest_info in rests_info:
     nor_cal = False
 
     sql = ('''SELECT RestaurantType, RestaurantsPriceRange2, Rating, GoodForMeal, RestaurantsTableService, Favorites, Latitude, Zip
-       FROM Restaurant WHERE Site = "''' + restaurant + '''";''')
+       FROM Restaurant WHERE Site = "''' + restaurant + '''" AND Rating IS NOT NULL;''')
     sql_db.cursor.execute(sql)
     sql_info = sql_db.cursor.fetchone()
-    if not sql_info:
+
+    if not sql_info or any([obj=='NULL' for obj in sql_info]):
         continue
 
     if sql_info[6] > 36.1075:
