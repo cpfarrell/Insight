@@ -15,9 +15,22 @@ import helper
 import sql_database
 db = sql_database.DbAccess('YELP', usr='root')
 
-stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcombiz', 'food', 'place']
+stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcombiz', 'food', 'place', 'dish']
 
 n_restaurants = 5
+
+#Find the next most common word, but check to make sure it is not a subword of something we already have
+def next_word(words, indices, ngrams):
+    for index in indices:
+        new = True
+        for idx, word in enumerate(words):
+            if ngrams[index] in word or word in ngrams[index]:
+                #Generally, the longer the ngram the better so lets replace the earlier one if we have something longer
+                if len(ngrams[index])>len(word):
+                    words[idx] = ngrams[index]
+                new = False
+        if new:
+            return ngrams[index]
 
 def tf_idf(df, r1Reviews, r2Review):
     Reviews = r1Reviews
@@ -26,8 +39,9 @@ def tf_idf(df, r1Reviews, r2Review):
 
     vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=1.0, stop_words='english', ngram_range=(1,2))
     r2_ngrams = vectorizer.fit(r2Review).get_feature_names()
+    r2_ngrams = [ngram for ngram in r2_ngrams if not any(word in stop_words for word in ngram.split())]    
 
-    vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=1.0, stop_words=stop_words, ngram_range=(1,2), vocabulary=r2_ngrams)
+    vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=1.0, stop_words='english', ngram_range=(1,2), vocabulary=r2_ngrams)
     tfidf_counts = vectorizer.fit_transform(Reviews)
     r2 = tfidf_counts[-1,:]
     r1 = tfidf_counts[range(tfidf_counts.shape[0]-1),:]
@@ -39,10 +53,10 @@ def tf_idf(df, r1Reviews, r2Review):
     similarity = np.divide(cosine, lengths).A1
 
     #max_indices = product.argmax(axis=1)
-    product_sort = product.argsort(axis=1)
-    max_words = [r2_ngrams[idx] for idx in product_sort[:,-1].A1]
-    max_words2 = [r2_ngrams[idx] for idx in product_sort[:,-2].A1]
-    max_words3 = [r2_ngrams[idx] for idx in product_sort[:,-3].A1]
+    product_sort = (-product).argsort(axis=1)
+    max_words = [next_word([], product_sort[idx,:].A1, r2_ngrams) for idx in range(product_sort.shape[0])]
+    max_words2 = [next_word([max_words[idx]], product_sort[idx,:].A1, r2_ngrams) for idx in range(product_sort.shape[0])]
+    max_words3 = [next_word([max_words[idx], max_words2[idx]], product_sort[idx,:].A1, r2_ngrams) for idx in range(product_sort.shape[0])]
 
     df['max_words'] = max_words
     df['max_words2'] = max_words2
