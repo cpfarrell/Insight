@@ -140,8 +140,21 @@ del df['r1Type']
 del df['r2Food']
 del df['r2Type']
 sql_db.cursor.execute('DROP TABLE IF EXISTS Review;')
-pandas.io.sql.write_frame(df, 'Review', sql_db.cnx, flavor='mysql')
+command = 'CREATE TABLE Review ('
+for column in df.columns.values:
+    command += ' ' + column + ' CHAR(100),'
+    
+command = command[:-1] + ');'
+sql_db.cursor.execute(command)
 
-#Command = 'INSERT INTO Review (USERID, NorCalRest, NorCalRating, NorCalAvgRating, SoCalRest, SoCalRating, SoCalAvgRating) VALUES("%s", "%s", %f, %f, "%s", %f, %f);' % (user, norcal_rest[0], norcal_rest[1], norcal_rest[2], socal_rest[0], socal_rest[1], socal_rest[2])
-#sql_db.cursor.execute(Command)
-#sql_db.commit()
+for row in range(len(df)):
+    command = 'Insert INTO Review('
+    for column in df.columns.values:
+        command += ' ' + column + ','
+    command = command[:-1] + ') VALUES ('
+    for column in df.columns.values:
+        command += ' "' + str(df.ix[row, column]) + '",'
+    command = command[:-1] + ')'
+    sql_db.cursor.execute(command)
+    sql_db.commit()
+
