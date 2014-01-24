@@ -22,17 +22,17 @@ def hello():
 
 @app.route("/maps")
 def maps():
-    restaurant = request.args.get('restaurant', '')
-    miles = request.args.get('miles', '')
-    zipcode = request.args.get('zipcode', '')
+    restaurant = request.args.get("restaurant", "")
+    miles = request.args.get("miles", "")
+    zipcode = request.args.get("zipcode", "")
     return render_template('maps.html', restaurant=restaurant, miles=miles, zipcode=zipcode)
 
 @app.route("/restaurant")
 def restaurant():
     #Get input arguments
-    restaurant = request.args.get('restaurant', '')
-    miles = request.args.get('miles', '')
-    zipcode = request.args.get('zipcode', '')
+    restaurant = request.args.get("restaurant", "")
+    miles = request.args.get("miles", '')
+    zipcode = request.args.get("zipcode", "")
     return json.dumps(predict_rest.predict_rest(restaurant, miles, zipcode))
 
 def list_restaurants():
