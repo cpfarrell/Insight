@@ -9,6 +9,7 @@ import pandas
 from sklearn import linear_model
 from sklearn.externals import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
+from pygeocoder import Geocoder
 
 #My modules
 import helper
@@ -67,15 +68,19 @@ def tf_idf(df, r1Reviews, r2Review):
     return df
 
 def predict_rest(restaurant, miles, zipcode):
+    results = Geocoder.geocode(zipcode)
+    lat = str(results[0].coordinates[0])
+    long = str(results[0].coordinates[1])
+
     df = pandas.io.sql.read_frame('''
      SELECT r1.Name as r1Name, r1.FullName as r1FullName, r1.RestaurantType as r1Type, r1.Site as r1Site, 
      r1.Street as r1Street, r1.City as r1City, r1.State as r1State, r1.Zip as r1Zip, r1.Phone as r1Phone,
      r2.RestaurantType as r2Type, ABS(r1.RestaurantsPriceRange2 - r2.RestaurantsPriceRange2) as PriceDiff,
      ABS(r1.Rating - r2.Rating) as RatingDiff, r1.Latitude as Latitude, r1.Longitude as Longitude, r1.GoodForMeal=r2.GoodForMeal as MealSame,
      r1.RestaurantsTableService=r2.RestaurantsTableService as TableSame, r1.Favorites as r1Food, r2.Favorites as r2Food '''
-     '''FROM Restaurant r1 JOIN ZipCodes
-     ON DISTANCE(ZipCodes.Latitude, ZipCodes.Longitude, r1.Latitude, r1.Longitude) < ''' + miles + ''' CROSS JOIN Restaurant r2
-     WHERE (r2.FullName = "''' + restaurant + '''" OR r2.Site = "''' + restaurant + '''") AND ZipCodes.Zip = ''' + zipcode + ''' AND r1.NReviews > 100;'''
+     '''FROM Restaurant r1 CROSS JOIN Restaurant r2
+     WHERE DISTANCE(''' + lat + ''', ''' + long + ''', r1.Latitude, r1.Longitude) < ''' + miles + '''
+     AND (r2.FullName = "''' + restaurant + '''" OR r2.Site = "''' + restaurant + '''") AND r1.NReviews > 100;'''
                                   , db.cnx)
 
     if len(df)==0:

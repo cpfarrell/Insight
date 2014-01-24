@@ -42,8 +42,8 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    max_long = -999999.
 	    console.log(parsedJson.length)
 	    if (parsedJson.length==0) {
-		$('#output_results').val("No restaurants found. Please increase radius or search in a supported city");
-		$('#output_results').html("No restaurants found. Please increase radius or search in a supported city");
+		$('#output_results').val("No restaurants found. Currently YOOGLE only supports the Los Angeles and San Francisco bay area");
+		$('#output_results').html("No restaurants found. Currently YOOGLE only supports the Los Angeles and the San Francisco bay area");
 		return result
 	    }
 
