@@ -15,7 +15,7 @@ import helper
 import sql_database
 db = sql_database.DbAccess('YELP', usr='root')
 
-stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcombiz', 'food', 'place', 'dish']
+stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcombiz', 'food', 'place', 'dish', 'good', 'newsentencebegin', 'NEWREVIEW', 'newreview', 'like']
 
 n_restaurants = 5
 
@@ -114,5 +114,5 @@ def predict_rest(restaurant, miles, zipcode):
     return restaurants
 
 if __name__=='__main__':
-    print predict_rest("Kotoya Ramen 11901 Santa Monica Blvd Los Angeles, CA 90025", "10", "33618")
+    print predict_rest("Fat Sal's Deli 972 Gayley Ave Los Angeles, CA 90024", "10", "94117")
 #    print predict_rest("/biz/tender-greens-hollywood", "5", "95135")
