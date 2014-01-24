@@ -26,13 +26,15 @@ def next_word(words, indices, ngrams):
     for index in indices:
         new = True
         for idx, word in enumerate(words):
-            if ngrams[index] in word or word in ngrams[index]:
+            if (ngrams[index] in word) or (word in ngrams[index]):
                 #Generally, the longer the ngram the better so lets replace the earlier one if we have something longer
                 if len(ngrams[index])>len(word):
                     words[idx] = ngrams[index]
                 new = False
+                    
         if new:
-            return ngrams[index]
+            words.append(ngrams[index])
+            return '<br>'.join(words)
 
 def tf_idf(df, r1Reviews, r2Review):
     Reviews = r1Reviews
@@ -57,12 +59,12 @@ def tf_idf(df, r1Reviews, r2Review):
     #max_indices = product.argmax(axis=1)
     product_sort = (-product).argsort(axis=1)
     max_words = [next_word([], product_sort[idx,:].A1, r2_ngrams) for idx in range(product_sort.shape[0])]
-    max_words2 = [next_word([max_words[idx]], product_sort[idx,:].A1, r2_ngrams) for idx in range(product_sort.shape[0])]
-    max_words3 = [next_word([max_words[idx], max_words2[idx]], product_sort[idx,:].A1, r2_ngrams) for idx in range(product_sort.shape[0])]
+    max_words = [next_word(max_words[idx].split('<br>'), product_sort[idx,:].A1, r2_ngrams) for idx in range(product_sort.shape[0])]
+    max_words = [next_word(max_words[idx].split('<br>'), product_sort[idx,:].A1, r2_ngrams) for idx in range(product_sort.shape[0])]
 
     df['max_words'] = max_words
-    df['max_words2'] = max_words2
-    df['max_words3'] = max_words3
+    #df['max_words2'] = max_words2
+    #df['max_words3'] = max_words3
     df['similarity'] = similarity
     df = df.sort('similarity', ascending=False).reset_index()
 
@@ -115,7 +117,7 @@ def predict_rest(restaurant, miles, zipcode):
 
     restaurants = []
     for i in range(n_restaurants):
-        restaurants.append({'Name' :df.ix[i, 'r1Name'], 'Words': (df.ix[i, 'max_words'] + '<br>' + df.ix[i, 'max_words2'] + '<br>' + df.ix[i, 'max_words3']),
+        restaurants.append({'Name' :df.ix[i, 'r1Name'], 'Words': df.ix[i, 'max_words'],
                             'Street': df.ix[i, 'r1Street'], 'City': df.ix[i, 'r1City'] + ', ' + df.ix[i, 'r1State'] + ' ' + df.ix[i, 'r1Zip'],  'Phone': df.ix[i, 'r1Phone'],
                             'Site': df.ix[i, 'r1Site'], 'Latitude': df.ix[i, 'Latitude'], 'Longitude': df.ix[i, 'Longitude']})
 
