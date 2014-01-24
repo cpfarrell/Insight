@@ -45,9 +45,15 @@ def list_restaurants():
     # Python list is converted to JSON string
     return json.dumps(restaurants)
 
+funcs = {
+        "restaurants": list_restaurants
+}
+
 @app.route("/json/<what>")
 def ajson(what):
-    return list_restaurants()
+    if what=='restaurants':
+        print 'Test'
+        return funcs[what]()
 
 @app.route('/<pagename>')
 def regularpage(pagename=None):

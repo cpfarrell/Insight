@@ -16,9 +16,13 @@ var map;
 // Javascript to get restaurant from page
 function getRestaurant(restaurant, zipcode, miles) {
     //Log inputs to console
+    //restaurant = html_entity_decode(restaurant)
+    restaurant = $('<div />').html(restaurant).text();
+    restaurant = restaurant.replace("&","%26");
     console.log(("Input is restaurant = " + restaurant + ", miles = " + miles + " and zipcode = " + zipcode));
     //Go to the page /restaurant (see drive_app.py) and pass in the arguments restaurant and zipcode
-    $.get('/restaurant?restaurant='+restaurant+'&miles='+miles+'&zipcode='+zipcode, function(result) {
+    console.log("/restaurant?restaurant="+restaurant+"&miles="+miles+"&zipcode="+zipcode)
+    $.get("/restaurant?restaurant="+restaurant+"&miles="+miles+"&zipcode="+zipcode, function(result) {
 	    //Log the output to console
 	    console.log("Output is = " + result);
 	    //Fill in the results that will go on the page

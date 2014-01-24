@@ -10,7 +10,8 @@
 {% block content %}
 <div class="starter-template">
     <h1>Yoogle</h1>
-    <p class="lead">Search for new restaurants<br> based on others that you like.</p>
+    <p class="lead">Longing for your favorite restaurant but not in the area?<br>
+      With Yoogle just input the restaurant and find similar restaurants where you are
 </div>
 
 <div id="control_panel">
@@ -18,14 +19,16 @@
     <form autocomplete="on">
       Find a restaurant like
       <!--- Box where user inputs restaurant, has name restaurant_type --->
-      <input type="text" id="restaurant_name" placeholder="Restaurant" class="form-control" size="60">
+      <input type="text" id="restaurant_name" placeholder="Restaurant" class="form-control" size="40">
       <!--- <input id="restaurant_name" type="text" placeholder="Restaurant" size="30" autocomplete="on"> --->
-      with
+      within
       <!--- Box where user inputs allowed distance, has name miles --->
-      <input id="miles" type="text" placeholder="Miles" size="10">
+      <input type="text" id="miles" placeholder="miles" class="form-control" size="3">
+      <!--- <input id="miles" type="text" placeholder="Miles" size="10"> --->
       miles of
       <!--- Box where user inputs zip code, has name zipcode --->
-      <input id="zipcode" type="text" placeholder="Zip Code" size="10">
+      <input type="text" id="zipcode" placeholder="address" class="form-control" size="10">
+      <!--- <input id="zipcode" type="text" placeholder="Zip Code" size="10"> --->
       <!--- Button which starts collection of data from above forms --->
       <button type="button" id="find_button" href="maps">Search</button>
       <!--- Text box which will hold the output restaurants once the id values are filled -->
@@ -46,6 +49,7 @@
   $('#find_button').click(function() {
   //Collect the values in the form fields with ids of restaurant_name, miles, and zipcode
   var restaurant = $('#restaurant_name').val();
+  restaurant = restaurant.replace("&","%26");
   var miles = $('#miles').val();
   var zipcode = $('#zipcode').val();
   //Call the getRestaurant function in data.js with the input values
@@ -55,14 +59,21 @@
   });
 </script>
 
-<!---
+
 <script>
-    $('#restaurant_name').typeahead({
-    name: 'restaurants',
-    //prefetch: '/q?restaurants=B',
-    remote: '/json/restaurants?q=%QUERY',
+    $('#miles').typeahead({
+    name: 'miles',
+    //prefetch: '/q?miles=B',
+    remote: '/json/miles?q=%QUERY',
+    limit: 10
+  });
+
+    $('#zipcode').typeahead({
+    name: 'address',
+    //prefetch: '/q?address=B',
+    remote: '/json/address?q=%QUERY',
     limit: 10
   });
 </script>
---->
+
 {% endblock %}

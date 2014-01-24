@@ -88,7 +88,19 @@
     remote: '/json/restaurants?q=%QUERY',
     limit: 10
   });
-</script>
+  </script>
+
+<!---
+    <script>
+      $('miles').typeahead({
+      name: 'miles',
+      //prefetch: '/q?miles=B',
+      remote: '/json/miles?q=%QUERY',
+      limit: 10
+      });
+    </script>
+--->
+
   {% block scripts %}{% endblock %}
 
   </body>
