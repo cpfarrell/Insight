@@ -22,6 +22,7 @@ for SoCalRest in SoCalRests:
         sql = ('SELECT * FROM Review WHERE SoCalRest = "' + SoCalRest[0] + '" AND NorCalRest = "' + site + '";')
         db.cursor.execute(sql)
         CommonReviews = db.cursor.fetchall()
-
         if len(CommonReviews)>0:
+            matches.append((SoCalRest[0], site))
             print SoCalRest[0] + ' ' + site + ' ' + str(len(CommonReviews))
+print matches
