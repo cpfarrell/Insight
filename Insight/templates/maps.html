@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 
 {% block style %}
-#map-canvas { height: 85%; margin: 0px; float: right; width: 70%; margin-top: 50px }
-#results { height: 85%; margin: 0px; float: left; width: 30%; margin-top: 50px }
+<link href="static/css/typeahead.css" rel="stylesheet">
+<link href="static/dist/css/bootstrap.css" rel="stylesheet">
+
+<style>
+#map-canvas {height: 86%; margin: 0px; float: right; width: 70%; margin-top: 50px }
+#results { height: 85%; margin: 0px; float: left; width: 25%; margin-top: 50px; margin-left: 15px }
 #infowindow {
     width: 150px; !important
 }
@@ -10,26 +14,43 @@
 {% endblock %}
 
 {% block content %}
+
 <div id="results">
   <div style="margin:40px;border-width:2px;">
-    <form autocomplete="on">
-      Find a restaurant like<br><br>
-      <!--- Box where user inputs restaurant, has name restaurant_type --->
-      <input type="text" id="restaurant_name" placeholder="Restaurant" class="form-control" size="60">
-      <!--- <input id="restaurant_name" type="text" placeholder="Restaurant" size="30" autocomplete="on"> --->
-      with
-      <!--- Box where user inputs allowed distance, has name miles --->
-      <input id="miles" type="text" placeholder="Miles" size="10">
-      miles of
-      <!--- Box where user inputs zip code, has name zipcode --->
-      <input id="zipcode" type="text" placeholder="Zip Code" size="10">
-      <!--- Button which starts collection of data from above forms --->
-      <button type="button" id="find_button" href="maps">Search</button>
-      <!--- Text box which will hold the output restaurants once the id values are filled -->
-      <div id="points"></div>
-      <p class="lead" id="output_results"></p>
+    <p class="lead" id="output_results"></p>
+      <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+	New search
+      </button>
   </div>
 </div>
+
+<div id="map-canvas"></div>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">New search</h4>
+      </div>
+      <div class="modal-body">
+	Old restaurant<br>
+	<input type="text" id="restaurant_name" placeholder="Restaurant" class="form-control" size="60">
+	<!---
+	with
+	<input id="miles" type="text" placeholder="miles" size="10">
+	miles of
+	--->
+	<br><br>New address<br>
+	<input type="text" id="zipcode" placeholder="New Address" class="form-control" size="60">	
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" id="find_button" class="btn btn-primary" data-dismiss="modal">New search</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <div id="map-canvas"></div>
 
@@ -47,13 +68,24 @@
       //readInfo({{latitudes}}, {{longitudes}})
       //When the button with id find_button is clicked then do these actions
       $('#find_button').click(function() {
+         console.log('button clicked')
          //Collect the values in the form fields with ids of restaurant_name, miles, and zipcode
          var restaurant = $('#restaurant_name').val();
-         var miles = $('#miles').val();
+         <!--- var miles = $('#miles').val(); --->
+         var miles = "5"
          var zipcode = $('#zipcode').val();
          //Call the getRestaurant function in data.js with the input values
          getRestaurant(restaurant, zipcode, miles);
       });
     });
   </script>
+
+<script>
+    $('#zipcode').typeahead({
+    name: 'address',
+    //prefetch: '/q?address=B',
+    remote: '/json/address?q=%QUERY',
+    limit: 10
+  });
+</script>
 {% endblock %}

@@ -52,7 +52,6 @@ funcs = {
 @app.route("/json/<what>")
 def ajson(what):
     if what=='restaurants':
-        print 'Test'
         return funcs[what]()
 
 @app.route('/<pagename>')

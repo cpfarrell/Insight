@@ -16,7 +16,8 @@ import helper
 import sql_database
 db = sql_database.DbAccess('YELP', usr='root')
 
-stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcombiz', 'food', 'place', 'dish', 'good', 'newsentencebegin', 'NEWREVIEW', 'newreview', 'like']
+stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcombiz', 'food', 'place', 'dish', 'good', 'newsentencebegin', 'NEWREVIEW', 'newreview', 'like',
+              'really', 'great', 'menu', 'restaurant']
 
 n_restaurants = 5
 
@@ -93,7 +94,9 @@ def predict_rest(restaurant, miles, zipcode):
     logistic = joblib.load("data/logit.joblib.pkl")
     df['scores'] = logistic.decision_function(X)
     df = df.sort('scores', ascending=False).reset_index()
-    df = df.ix[range(50),:]
+    keep = 40
+    keep = min(max(keep, len(df.ix[df['scores']>4])), len(df))
+    df = df.ix[range(keep),:]
     #df=df.ix[df['scores']>4]
 
     #Sort by name to keep aligned
@@ -112,12 +115,11 @@ def predict_rest(restaurant, miles, zipcode):
 
     restaurants = []
     for i in range(n_restaurants):
-        restaurants.append({'Name' :df.ix[i, 'r1Name'], 'Words': (df.ix[i, 'max_words'] + ', ' + df.ix[i, 'max_words2'] + ', ' + df.ix[i, 'max_words3']),
+        restaurants.append({'Name' :df.ix[i, 'r1Name'], 'Words': (df.ix[i, 'max_words'] + '<br>' + df.ix[i, 'max_words2'] + '<br>' + df.ix[i, 'max_words3']),
                             'Street': df.ix[i, 'r1Street'], 'City': df.ix[i, 'r1City'] + ', ' + df.ix[i, 'r1State'] + ' ' + df.ix[i, 'r1Zip'],  'Phone': df.ix[i, 'r1Phone'],
                             'Site': df.ix[i, 'r1Site'], 'Latitude': df.ix[i, 'Latitude'], 'Longitude': df.ix[i, 'Longitude']})
 
     return restaurants
 
 if __name__=='__main__':
-    print predict_rest("Fat Sal's Deli 972 Gayley Ave Los Angeles, CA 90024", "10", "94117")
-#    print predict_rest("/biz/tender-greens-hollywood", "5", "95135")
+    print predict_rest("Juquila Restaurant 11619 Santa Monica Blvd Los Angeles, CA 90025", "5", "San Francisco, Ca")

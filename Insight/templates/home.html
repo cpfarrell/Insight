@@ -1,42 +1,55 @@
 {% extends "base.html" %}
 
 {% block head %}
+<style>
+body { background: #e67300 url("static/img/food_207811.jpg") no-repeat fixed top center; !important}
+</style> 
+
 <style type="text/css">
 <link href="static/dist/css/bootstrap.css" rel="stylesheet">
 <link href="static/dist/css/starter-template.css" rel="stylesheet">
+
 </style>
+
 {% endblock %}
 
 {% block content %}
-<div class="starter-template">
-    <h1>Yoogle</h1>
-    <p class="lead">Longing for your favorite restaurant but not in the area?<br>
-      With Yoogle just input the restaurant and find similar restaurants where you are
+<div class="starter-template" style="color:#e67300; background-color: white; width: 64%; margin-left: 18%;">
+  <big><big>
+    <h1><center><font size="7">Yoogle</font></center></h1>
+    <p class="lead"><center>Longing for your favorite restaurant but not in the area?<br>
+      With Yoogle just input the restaurant and find similar restaurants where you are</center>
+      </big></big>
 </div>
 
-<div id="control_panel">
-  <div style="margin:40px;border-width:2px;">
-    <form autocomplete="on">
-      Find a restaurant like
+<div class="jumbotron" style="width:34%; margin-left: 33%; margin-top: 9%; padding-top: 3px; padding-bottom: 1px">
+<!--- <div id="control_panel"> --->
+<!---     <form autocomplete="on"> --->
+      <!--- Find a restaurant like --->
       <!--- Box where user inputs restaurant, has name restaurant_type --->
-      <input type="text" id="restaurant_name" placeholder="Restaurant" class="form-control" size="40">
+      <small>
+      <center>
+	The restaurant you wish you could go to<br>
+      <input type="text" id="restaurant_name" placeholder="Old restaurant" class="form-control" size="40">
+      <br>The place where you actually are<br>
       <!--- <input id="restaurant_name" type="text" placeholder="Restaurant" size="30" autocomplete="on"> --->
-      within
+      <!--- <br>within --->
       <!--- Box where user inputs allowed distance, has name miles --->
-      <input type="text" id="miles" placeholder="miles" class="form-control" size="3">
+      <!---  <input type="text" id="miles" placeholder="miles" class="form-control" size="3"> --->
       <!--- <input id="miles" type="text" placeholder="Miles" size="10"> --->
-      miles of
+      <!--- miles of --->
       <!--- Box where user inputs zip code, has name zipcode --->
-      <input type="text" id="zipcode" placeholder="address" class="form-control" size="10">
-      <!--- <input id="zipcode" type="text" placeholder="Zip Code" size="10"> --->
+      <input type="text" id="zipcode" placeholder="New Address" class="form-control" size="40">
+      <br>
+     <!--- <input id="zipcode" type="text" placeholder="Zip Code" size="10"> --->
       <!--- Button which starts collection of data from above forms --->
-      <button type="button" id="find_button" href="maps">Search</button>
+      <button type="button" class="btn btn-default" id="find_button" href="maps" size="40">Search</button>
+      </center>
+      </small>
       <!--- Text box which will hold the output restaurants once the id values are filled -->
       <div id="points"></div>
       <p class="lead" id="output_results"></p>
-  </div>
 </div>
-
 {% endblock %}
 
 {% block scripts %}
@@ -46,15 +59,16 @@
   $(document).ready(function(){
   console.log( "ready!" );
   //When the button with id find_button is clicked then do these actions
-  $('#find_button').click(function() {
+  $("#find_button").click(function() {
   //Collect the values in the form fields with ids of restaurant_name, miles, and zipcode
   var restaurant = $('#restaurant_name').val();
   restaurant = restaurant.replace("&","%26");
-  var miles = $('#miles').val();
+  <!--- var miles = $('#miles').val(); --->
+  var miles = "5"
   var zipcode = $('#zipcode').val();
   //Call the getRestaurant function in data.js with the input values
   <!---getRestaurant(restaurant, zipcode, miles);--->
-  window.location.href = 'maps?restaurant='+restaurant+'&miles='+miles+'&zipcode='+zipcode
+  window.location.href = "maps?restaurant="+restaurant+"&miles="+miles+"&zipcode="+zipcode
   });
   });
 </script>
