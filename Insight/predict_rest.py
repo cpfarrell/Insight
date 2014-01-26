@@ -10,6 +10,7 @@ from sklearn import linear_model
 from sklearn.externals import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 from pygeocoder import Geocoder
+import nltk
 
 #My modules
 import helper
@@ -17,21 +18,32 @@ import sql_database
 db = sql_database.DbAccess('YELP', usr='root')
 
 stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcombiz', 'food', 'place', 'dish', 'good', 'newsentencebegin', 'NEWREVIEW', 'newreview', 'like',
-              'really', 'great', 'menu', 'restaurant']
+              'really', 'great', 'menu', 'restaurant', 'santa', 'monica', 'groupon', 'happy', 'hour', 'tony', 'rag', 'httpwwwyelpcomuser', 'waitress']
 
 n_restaurants = 5
+
+def word_match(word1, word2):
+    if any([any(nltk.metrics.edit_distance(s_word1, s_word2)<3 for s_word2 in word2.split()) for s_word1 in word1.split()]):
+        return True
+    return False
 
 #Find the next most common word, but check to make sure it is not a subword of something we already have
 def next_word(words, indices, ngrams):
     for index in indices:
         new = True
+        replaced=False
+        #Check if the next ngram is similar to previously found ones and if so don't use it
         for idx, word in enumerate(words):
-            if (ngrams[index] in word) or (word in ngrams[index]):
+            if word_match(ngrams[index], word):
                 #Generally, the longer the ngram the better so lets replace the earlier one if we have something longer
+                new = False
                 if len(ngrams[index])>len(word):
                     words[idx] = ngrams[index]
-                new = False
-                    
+                    #If ngram already swapped forward and another match occurs, then need to get unsimilar one
+                    if replaced:
+                        words = next_word(words[:idx], indices, ngrams).split('<br>')
+                    replaced=True
+
         if new:
             words.append(ngrams[index])
             return '<br>'.join(words)
@@ -96,8 +108,8 @@ def predict_rest(restaurant, miles, zipcode):
     logistic = joblib.load("data/logit.joblib.pkl")
     df['scores'] = logistic.decision_function(X)
     df = df.sort('scores', ascending=False).reset_index()
-    keep = 40
-    keep = min(max(keep, len(df.ix[df['scores']>4])), len(df))
+    keep = 50
+    keep = min(min(keep, len(df.ix[df['scores']>4])), len(df))
     df = df.ix[range(keep),:]
     #df=df.ix[df['scores']>4]
 
