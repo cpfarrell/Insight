@@ -5,26 +5,43 @@
 <link href="static/dist/css/bootstrap.css" rel="stylesheet">
 
 <style>
-#map-canvas {height: 86%; margin: 0px; float: right; width: 70%; margin-top: 50px }
 #results { height: 85%; margin: 0px; float: left; width: 25%; margin-top: 50px; margin-left: 15px }
 #infowindow {
     width: 150px; !important
 }
+<!---
+img {
+  position: absolute;
+  left: 10px;
+  top: 60px;
+  display: block;
+  clip: rect(20px, 0, 0, 0px);
+}--->
 </style>
 {% endblock %}
 
 {% block content %}
-
-<div id="results">
-  <div style="margin:40px;border-width:2px;">
-    <p class="lead" id="output_results"></p>
-      <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-	New search
-      </button>
+<div>
+  <div class="jumbotron" id="output_results" style="width:30%; float:right; margin-left: 68%; margin-top: 8%; padding: 10px; padding-top: 1px; z-index: 11; position:absolute;
+						    background: transparent; color: #fffef9; font-family: 'Love Ya Like A Sister' !important;"><big>
+    Top Restaurants:
+<!--- background: #404040; --->
+    </big>
   </div>
 </div>
 
-<div id="map-canvas"></div>
+<div>
+  <img src="static/img/CutPicture.com_2014-Jan-24_03_56_39.jpg" style="height: 60%; width:30%; float:right; margin-left: 68%; margin-top: 8%; 
+	padding: 5px; padding-top: 1px; z-index: 8; position:absolute;">
+</div>
+
+
+<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" style="z-index:14; position:absolute; margin-left:5%; margin-top:40%">
+  New search
+</button>
+
+<div id="map-canvas" style="position:absolute; z-index: 5"></div> 
+
 
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -52,13 +69,14 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<div id="map-canvas"></div>
-
 {% endblock %}
 
 {% block scripts %}
 <script src="static/dist/js/locations.js"></script>
 <script>
+  var height = $('#map-canvas').height()
+  document.getElementById('map-canvas').style.height = (height - 50) + 'px';
+  //document.getElementById('map-canvas').style.height = document.getElementById('map-canvas').style.height - 50px
     // Search send (press enter) - jquery
     // Wait til page load is ready
     $(document).ready(function(){

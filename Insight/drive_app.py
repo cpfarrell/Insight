@@ -53,6 +53,8 @@ funcs = {
 def ajson(what):
     if what=='restaurants':
         return funcs[what]()
+    else:
+        return json.dumps([])
 
 @app.route('/<pagename>')
 def regularpage(pagename=None):

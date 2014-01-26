@@ -19,6 +19,7 @@ function getRestaurant(restaurant, zipcode, miles) {
     //restaurant = html_entity_decode(restaurant)
     restaurant = $('<div />').html(restaurant).text();
     restaurant = restaurant.replace("&","%26");
+    restaurant = restaurant.replace("+","%2B");
     console.log(("Input is restaurant = " + restaurant + ", miles = " + miles + " and zipcode = " + zipcode));
     //Go to the page /restaurant (see drive_app.py) and pass in the arguments restaurant and zipcode
     console.log("/restaurant?restaurant="+restaurant+"&miles="+miles+"&zipcode="+zipcode)
@@ -31,7 +32,7 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    parsedJson = eval(result);
 	    console.log("The output" + parsedJson)
 	    console.log(parsedJson)
-	    names = "<br>Top restaurants:<br>"
+	    names = "<big>Top Restaurants:<br>"
 		//coordinates = []
 	    avg_latitude = 0
 	    avg_longitude = 0
@@ -60,12 +61,15 @@ function getRestaurant(restaurant, zipcode, miles) {
             avg_longitude = avg_longitude/parsedJson.length
 	    console.log(avg_latitude + " " + avg_longitude)
 	    map.setCenter(new google.maps.LatLng(avg_latitude, avg_longitude));
+	    console.log(max_long)
+	    max_long = max_long + (max_long-min_long)*0.3
+	    console.log(max_long)
 	    var bounds = new google.maps.LatLngBounds(new google.maps.LatLng(min_lat, min_long),new google.maps.LatLng(max_lat, max_long));
 	    map.fitBounds(bounds);
 
 	    drop()
-	    $('#output_results').val(names);
-	    $('#output_results').html(names);
+	    $('#output_results').val(names + "</big>");
+	    $('#output_results').html(names + "</big>");
 	    //I don't think this returned value is used at all
 	    return result;
 	});

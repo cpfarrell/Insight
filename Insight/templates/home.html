@@ -22,7 +22,7 @@ body { background: #e67300 url("static/img/food_207811.jpg") no-repeat fixed top
       </big></big>
 </div>
 
-<div class="jumbotron" style="width:34%; margin-left: 33%; margin-top: 9%; padding-top: 3px; padding-bottom: 1px">
+<div class="jumbotron" style="width:36%; margin-left: 32%; margin-top: 8%; padding-top: 3px; padding-bottom: 1px">
 <!--- <div id="control_panel"> --->
 <!---     <form autocomplete="on"> --->
       <!--- Find a restaurant like --->
@@ -63,11 +63,13 @@ body { background: #e67300 url("static/img/food_207811.jpg") no-repeat fixed top
   //Collect the values in the form fields with ids of restaurant_name, miles, and zipcode
   var restaurant = $('#restaurant_name').val();
   restaurant = restaurant.replace("&","%26");
+  restaurant = restaurant.replace("+","%2B");
   <!--- var miles = $('#miles').val(); --->
   var miles = "5"
   var zipcode = $('#zipcode').val();
   //Call the getRestaurant function in data.js with the input values
   <!---getRestaurant(restaurant, zipcode, miles);--->
+  console.log("Passing " + restaurant)
   window.location.href = "maps?restaurant="+restaurant+"&miles="+miles+"&zipcode="+zipcode
   });
   });
