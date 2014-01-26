@@ -65,7 +65,7 @@ def tf_idf(df, r1Reviews, r2Review):
     product = r1.multiply(r2).todense()
     cosine = r1.dot(r2.transpose()).todense()
     #cosine = np.sum(product)
-    lengths = r1.sum(axis=1)
+    lengths = np.sqrt(r1.multiply(r1).sum(axis=1))
     similarity = np.divide(cosine, lengths).A1
 
     #max_indices = product.argmax(axis=1)
