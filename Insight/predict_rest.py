@@ -127,7 +127,7 @@ def predict_rest(restaurant, miles, zipcode):
                                   , db.cnx)
     if len(df)==0:
         return []
-
+    
     df = helper.transform(df)
 
     #Use logistic regression to reduce list of possible restaurants
@@ -145,15 +145,13 @@ def predict_rest(restaurant, miles, zipcode):
 
     #Grab reviews from those restaurants. Python sort instead of SQL ORDER BY because of different treatment of capitalized letters
     r1FullNames = '", "'.join(df['r1FullName'].tolist())
-    db.cursor.execute('SELECT FullName, Review FROM Restaurant WHERE FullName IN ("' + r1FullNames + '") AND NReviews > 100;')
+    db.cursor.execute('SELECT FullName, Review FROM Restaurant WHERE FullName IN ("' + r1FullNames + '") AND NReviews>64;')
     r1Reviews = db.cursor.fetchall()
     r1Reviews = sorted(r1Reviews)
-    
 
     db.cursor.execute('SELECT FullName, Review FROM Restaurant WHERE (FullName = "' + restaurant + '" OR Site = "' + restaurant + '");')
     r2Review = db.cursor.fetchone()
     
-
     df = tf_idf(df, r1Reviews, r2Review)[:n_restaurants]
 
     restaurants = []
@@ -165,4 +163,4 @@ def predict_rest(restaurant, miles, zipcode):
     return restaurants
 
 if __name__=='__main__':
-    print predict_rest("Cha Cha Chicken 1906 Ocean Ave Santa Monica, CA 90405", "10", "San Francisco, Ca")
+    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "10", "Mountain View")
