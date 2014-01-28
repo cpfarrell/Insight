@@ -23,10 +23,8 @@ img {
 {% block content %}
 <div>
   <div class="jumbotron" id="output_results" style="width:30%; float:right; margin-left: 68%; margin-top: 8%; padding: 10px; padding-top: 1px; z-index: 11; position:absolute;
-						    background: transparent; color: #fffef9; font-family: 'Love Ya Like A Sister' !important;"><big>
+						    background: transparent; color: #fffef9; font-family: 'Love Ya Like A Sister' !important;">
     Top Restaurants:
-<!--- background: #404040; --->
-    </big>
   </div>
 </div>
 
@@ -51,7 +49,7 @@ img {
         <h4 class="modal-title" id="myModalLabel">New search</h4>
       </div>
       <div class="modal-body">
-	Old restaurant<br>
+	Old Favorite<br>
 	<input type="text" id="restaurant_name" placeholder="Restaurant" class="form-control" size="60">
 	<!---
 	with
@@ -59,7 +57,8 @@ img {
 	miles of
 	--->
 	<br><br>New address<br>
-	<input type="text" id="zipcode" placeholder="New Address" class="form-control" size="60">	
+	<input type="text" id="zipcode" placeholder="Street address, city, or zip code" class="form-control" size="60">	
+	<input type="text" id="miles"   placeholder="Miles" class="form-control" size="3">
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -89,8 +88,7 @@ img {
          console.log('button clicked')
          //Collect the values in the form fields with ids of restaurant_name, miles, and zipcode
          var restaurant = $('#restaurant_name').val();
-         <!--- var miles = $('#miles').val(); --->
-         var miles = "5"
+         var miles = $('#miles').val();
          var zipcode = $('#zipcode').val();
          //Call the getRestaurant function in data.js with the input values
          getRestaurant(restaurant, zipcode, miles);
@@ -99,6 +97,13 @@ img {
   </script>
 
 <script>
+    $('#miles').typeahead({
+    name: 'miles',
+    //prefetch: '/q?miles=B',
+    remote: '/json/miles?q=%QUERY',
+    limit: 10
+  });
+
     $('#zipcode').typeahead({
     name: 'address',
     //prefetch: '/q?address=B',

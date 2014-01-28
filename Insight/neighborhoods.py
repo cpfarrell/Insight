@@ -3,6 +3,7 @@ import redis_database
 redis_db = redis_database.RedisDatabase()
 
 sf = [
+
 "south+san+francisco",
 "mission%2C+san+francisco",
 "san+francisco",
@@ -14,6 +15,7 @@ sf = [
 "Castro%2C+San+Francisco%2C+CA",
 "Bayview-Hunters+Point%2C+San+Francisco%2C+CA",
 "Daly+City",
+"Outer+Mission%2C+San+Francisco%2C+CA"
 "Financial+District%2C+San+Francisco%2C+CA",
 "North+Beach%2FTelegraph+Hill%2C+San+Francisco%2C+CA",
 "Alamo+Square%2C+San+Francisco%2C+CA",
@@ -126,10 +128,13 @@ la = [
 "Manhattan+Beach%2C+CA",
 ]
 
-neighborhoods = sf
-sf.extend(bayarea)
-sf.extend(la)
+def main():
+    neighborhoods = sf
+    sf.extend(bayarea)
+    sf.extend(la)
 
-for neighborhood in neighborhoods:
-    redis_db.add_to_group("neighborhoods", neighborhood)
+    for neighborhood in neighborhoods:
+        redis_db.add_to_group("neighborhoods", neighborhood)
 
+if __name__ == '__main__':
+    main()

@@ -10,7 +10,7 @@ import nltk
 import pymongo
 from pymongo import MongoClient
 
-import sql_database
+#import sql_database
 
 client = MongoClient()
 exclude = set(string.punctuation)
@@ -63,16 +63,17 @@ def main():
 
     attrs = ['Alcohol', 'HasTV', 'NoiseLevel', 'RestaurantsAttire', 'BusinessAcceptsCreditCards', 'Ambience', 'RestaurantsGoodForGroups', 'Caters', 'WiFi', 'RestaurantsReservations', 'RestaurantsTakeOut', 'GoodForKids', 'WheelchairAccessible', 'RestaurantsTableService', 'OutdoorSeating', 'RestaurantsPriceRange2', 'RestaurantsDelivery', 'GoodForMeal', 'BusinessParking']
 
-    db_sql = sql_database.DbAccess('YELP', usr='root')
-    db_sql.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
+#    db_sql = sql_database.DbAccess('YELP', usr='root')
+#    db_sql.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
 
-    Columns = 'Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200), Phone CHAR(50), Site CHAR(100), Rating FLOAT, Favorites CHAR(200)'
+    Columns = 'Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200), Phone CHAR(50), Site CHAR(100), PictureUrl CHAR(150),'
+    Columns += 'Rating FLOAT, Favorites CHAR(200)'
     Columns += ', RestaurantType CHAR(200), Latitude FLOAT, Longitude FLOAT, SimilarRest1 CHAR(100), SimilarRest2 CHAR(100), SimilarRest3 CHAR(100), NReviews INT, Review LONGTEXT'
 
     for attr in attrs:
         Columns += ', ' + attr + ' CHAR(80)'
 
-    db_sql.cursor.execute('CREATE TABLE Restaurant (' + Columns + ');')
+#    db_sql.cursor.execute('CREATE TABLE Restaurant (' + Columns + ');')
 
     count = 0
     for rest_info in rests_info:
@@ -92,7 +93,7 @@ def main():
         soup = BeautifulSoup(page)
 
         restaurant = get_restaurant(soup)
-
+        print restaurant
         divs = soup.find_all('div')
 
         new_info = {}
@@ -119,6 +120,12 @@ def main():
         state = get_address(spans, "addressRegion")
         zipcode = get_address(spans, "postalCode")
         full_name = name + ' ' + street + ' ' + city + ', ' + state + ' ' + zipcode
+
+        picture_url = 'NULL'
+        picture_div = [div for div in divs if div.get("class") and len(div.get("class"))>1 and div.get("class")[1]=="biz-photo-box"]
+        if len(picture_div)>0:
+            picture_url = picture_div[0].img['src']
+            print picture_url
 
         #Get ngrams from snippets
         review_snippets = [div for div in divs if div.get("class") and len(div.get("class"))>1 and div.get("class")[0]=="media-story" and div.get("class")[1]=="snippet"]
@@ -174,13 +181,13 @@ def main():
                 review += clean_review(get_reviews(soup)).encode('ascii',errors='ignore')
 
         #Now insert all this information into SQL
-        Values = 'INSERT INTO Restaurant (Name, Street, City, State, Zip, FullName, Phone, Site, Rating, Favorites, RestaurantType'
+        Values = 'INSERT INTO Restaurant (Name, Street, City, State, Zip, FullName, Phone, Site, PictureUrl, Rating, Favorites, RestaurantType'
         Values += ', Latitude, Longitude, SimilarRest1, SimilarRest2, SimilarRest3, NReviews, Review'
         for attr in attrs:
             Values += ', ' + attr
         
-        Values += ') VALUES ("' + name + '", "' + street + '", "' + city + '", "' + state + '", "' + zipcode + '", "' + full_name + '", "' + telephone + '", "' + restaurant + '", '
-        Values += bizRating[0].meta["content"] + ', "' + "---".join(ngrams) + '", "' + "---".join(restaurant_type) + '", '
+        Values += ') VALUES ("' + name + '", "' + street + '", "' + city + '", "' + state + '", "' + zipcode + '", "' + full_name + '", "' + telephone + '", "' + restaurant
+        Values += '", "' + picture_url + '", ' + bizRating[0].meta["content"] + ', "' + "---".join(ngrams) + '", "' + "---".join(restaurant_type) + '", '
         Values += lat.encode('utf-8') + ', ' +  long.encode('utf-8') + ', "'
         Values += rec_links[0].encode('utf-8') + '", "' + rec_links[1].encode('utf-8') + '", "' + rec_links[2].encode('utf-8')  + '", '
         Values += str(n_reviews) + ', "' + review
@@ -196,11 +203,11 @@ def main():
             Columns += ', ' + attr + ' CHAR(80)'
 
         Values += ';'
-        db_sql.cursor.execute(Values)
-        db_sql.commit()
+#        db_sql.cursor.execute(Values)
+#        db_sql.commit()
 
-    db_sql.commit()
-    db_sql.close()
+#    db_sql.commit()
+#    db_sql.close()
 
 if __name__ == '__main__':
     main()

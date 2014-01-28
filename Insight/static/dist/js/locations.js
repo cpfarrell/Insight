@@ -32,7 +32,7 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    parsedJson = eval(result);
 	    console.log("The output" + parsedJson)
 	    console.log(parsedJson)
-	    names = "<big>Top Restaurants:<br>"
+	    names = "Top Restaurants:<br>"
 		//coordinates = []
 	    avg_latitude = 0
 	    avg_longitude = 0
@@ -43,8 +43,8 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    max_long = -999999.
 	    console.log(parsedJson.length)
 	    if (parsedJson.length==0) {
-		$('#output_results').val("No restaurants found. Currently YOOGLE only supports the Los Angeles and San Francisco bay area");
-		$('#output_results').html("No restaurants found. Currently YOOGLE only supports the Los Angeles and the San Francisco bay area");
+		$('#output_results').val("No restaurants found. Currently OldFaveNewHood only supports Los Angeles and SF bay area (San Fran to San Jose to Oakland");
+		$('#output_results').html("No restaurants found. Currently OldFaveNewHood only supports Los Angeles and SF bay area (San Fran to San Jose to Oakland");
 		return result
 	    }
 
@@ -62,14 +62,14 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    console.log(avg_latitude + " " + avg_longitude)
 	    map.setCenter(new google.maps.LatLng(avg_latitude, avg_longitude));
 	    console.log(max_long)
-	    max_long = max_long + (max_long-min_long)*0.3
+	    max_long = max_long + (max_long-min_long)*0.5
 	    console.log(max_long)
 	    var bounds = new google.maps.LatLngBounds(new google.maps.LatLng(min_lat, min_long),new google.maps.LatLng(max_lat, max_long));
 	    map.fitBounds(bounds);
 
 	    drop()
-	    $('#output_results').val(names + "</big>");
-	    $('#output_results').html(names + "</big>");
+	    $('#output_results').val(names);
+	    $('#output_results').html(names);
 	    //I don't think this returned value is used at all
 	    return result;
 	});
@@ -107,6 +107,7 @@ function drop() {
 		    addMarker(i);
 		}, i * 200);
         }
+	setAllMap(map)
 }
 
 function addMarker() {

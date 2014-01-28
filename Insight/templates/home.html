@@ -14,24 +14,23 @@ body { background: #e67300 url("static/img/food_207811.jpg") no-repeat fixed top
 {% endblock %}
 
 {% block content %}
-<div class="starter-template" style="color:#e67300; background-color: white; width: 64%; margin-left: 18%;">
+<div class="starter-template" style="color:blue; background-color: white; width: 48%; margin-top: 3%; margin-left: 26%; padding-top: 1px; padding-bottom: 10px;">
   <big><big>
-    <h1><center><font size="7">Yoogle</font></center></h1>
-    <p class="lead"><center>Longing for your favorite restaurant but not in the area?<br>
-      With Yoogle just input the restaurant and find similar restaurants where you are</center>
+    <h1><center><font size="7">OldFaveNewHood</font></center></h1>
+    <p class="lead"><center>Find your favorite restaurant wherever you are</center></p>
       </big></big>
 </div>
 
-<div class="jumbotron" style="width:36%; margin-left: 32%; margin-top: 8%; padding-top: 3px; padding-bottom: 1px">
+<div class="jumbotron" style="position:absolute; width:48%; margin-left: 26%; margin-top: 8%; padding-top: 3px; padding-bottom: 1px">
 <!--- <div id="control_panel"> --->
 <!---     <form autocomplete="on"> --->
       <!--- Find a restaurant like --->
       <!--- Box where user inputs restaurant, has name restaurant_type --->
       <small>
       <center>
-	The restaurant you wish you could go to<br>
+	Restaurant you wish you could go to<br>
       <input type="text" id="restaurant_name" placeholder="Old restaurant" class="form-control" size="40">
-      <br>The place where you actually are<br>
+      <br>Where you actually are<br>
       <!--- <input id="restaurant_name" type="text" placeholder="Restaurant" size="30" autocomplete="on"> --->
       <!--- <br>within --->
       <!--- Box where user inputs allowed distance, has name miles --->
@@ -39,9 +38,10 @@ body { background: #e67300 url("static/img/food_207811.jpg") no-repeat fixed top
       <!--- <input id="miles" type="text" placeholder="Miles" size="10"> --->
       <!--- miles of --->
       <!--- Box where user inputs zip code, has name zipcode --->
-      <input type="text" id="zipcode" placeholder="New Address" class="form-control" size="40">
-      <br>
-     <!--- <input id="zipcode" type="text" placeholder="Zip Code" size="10"> --->
+      <span>
+      <input type="text" id="zipcode" placeholder="Street address, city, or zip code" class="form-control" size="40">
+      <input type="text" id="miles"   placeholder="Miles" class="form-control" size="3"><br>
+      </span>
       <!--- Button which starts collection of data from above forms --->
       <button type="button" class="btn btn-default" id="find_button" href="maps" size="40">Search</button>
       </center>
@@ -64,8 +64,7 @@ body { background: #e67300 url("static/img/food_207811.jpg") no-repeat fixed top
   var restaurant = $('#restaurant_name').val();
   restaurant = restaurant.replace("&","%26");
   restaurant = restaurant.replace("+","%2B");
-  <!--- var miles = $('#miles').val(); --->
-  var miles = "5"
+  var miles = $('#miles').val();
   var zipcode = $('#zipcode').val();
   //Call the getRestaurant function in data.js with the input values
   <!---getRestaurant(restaurant, zipcode, miles);--->
