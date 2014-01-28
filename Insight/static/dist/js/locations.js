@@ -62,7 +62,7 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    console.log(avg_latitude + " " + avg_longitude)
 	    map.setCenter(new google.maps.LatLng(avg_latitude, avg_longitude));
 	    console.log(max_long)
-	    max_long = max_long + (max_long-min_long)*0.5
+	    max_long = max_long + (max_long-min_long)*0.6
 	    console.log(max_long)
 	    var bounds = new google.maps.LatLngBounds(new google.maps.LatLng(min_lat, min_long),new google.maps.LatLng(max_lat, max_long));
 	    map.fitBounds(bounds);
