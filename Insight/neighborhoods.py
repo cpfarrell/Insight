@@ -2,8 +2,16 @@ import redis_database
 
 redis_db = redis_database.RedisDatabase()
 
-sf = [
+ny = [
+"Manhattan%2C+NY",
+"Brooklyn%2C+NY",
+"Queens%2C+NY",
+"Bronx%2C+NY",
+"Staten+Island%2C+NY",
+"Long+Island+City%2C+Queens%2C+NY"
+]
 
+sf = [
 "south+san+francisco",
 "mission%2C+san+francisco",
 "san+francisco",
@@ -132,6 +140,7 @@ def main():
     neighborhoods = sf
     sf.extend(bayarea)
     sf.extend(la)
+    sf.extend(ny)
 
     for neighborhood in neighborhoods:
         redis_db.add_to_group("neighborhoods", neighborhood)

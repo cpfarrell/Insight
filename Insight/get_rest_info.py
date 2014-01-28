@@ -54,7 +54,7 @@ while redis_db.num_members("restaurant_to_search") > 0:
     if menu_url_list:
         menu_url = menu_url_list[0].a['href']
 
-        time.sleep(random.uniform(5,15))
+        time.sleep(random.uniform(2,6))
         menu = s.get('http://www.yelp.com' + menu_url)
         data_menu = menu.text
         rest_info['yelp_menu'] = data_menu

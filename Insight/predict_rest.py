@@ -19,7 +19,8 @@ db = sql_database.DbAccess('YELP', usr='root')
 afinn = dict(map(lambda (k,v): (k,int(v)), [ line.split('\t') for line in open("data/AFINN-111.txt") ]))
 
 stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcombiz', 'food', 'place', 'dish', 'good', 'newsentencebegin', 'NEWREVIEW', 'newreview', 'like',
-              'really', 'great', 'menu', 'restaurant', 'santa', 'monica', 'groupon', 'happy', 'hour', 'tony', 'rag', 'httpwwwyelpcomuser', 'waitress', 'valet']
+              'really', 'great', 'menu', 'restaurant', 'santa', 'monica', 'groupon', 'happy', 'hour', 'tony', 'rag', 'httpwwwyelpcomuser', 'waitress', 'valet', 'michelin'
+              , 'james', 'beard']
 
 n_restaurants = 5
 
@@ -123,7 +124,7 @@ def predict_rest(restaurant, miles, zipcode):
      r1.RestaurantsTableService=r2.RestaurantsTableService as TableSame, r1.Favorites as r1Food, r2.Favorites as r2Food '''
      '''FROM Restaurant r1 CROSS JOIN Restaurant r2
      WHERE DISTANCE(''' + latitude + ''', ''' + longitude + ''', r1.Latitude, r1.Longitude) < ''' + miles + '''
-     AND r2.FullName = "''' + restaurant + '''" AND r1.NReviews > 64;'''
+     AND r2.FullName = "''' + restaurant + '''" AND r1.NReviews > 50;'''
                                   , db.cnx)
     if len(df)==0:
         return []
@@ -135,23 +136,28 @@ def predict_rest(restaurant, miles, zipcode):
     logistic = joblib.load("data/logit.joblib.pkl")
     df['scores'] = logistic.decision_function(X)
     df = df.sort('scores', ascending=False).reset_index()
+    print "Matches" + str(len(df.ix[df['scores']>0]))
     keep = max(20, len(df.ix[df['scores']>0]))
+    keep = max(5, keep)
     keep = min(keep, len(df))
+    print 'Keep ' + str(keep)
+    print len(df)
     df = df.ix[range(keep),:]
     #df=df.ix[df['scores']>4]
 
     #Sort by name to keep aligned
     df = df.sort('r1FullName')
-
+    print len(df)
     #Grab reviews from those restaurants. Python sort instead of SQL ORDER BY because of different treatment of capitalized letters
     r1FullNames = '", "'.join(df['r1FullName'].tolist())
-    db.cursor.execute('SELECT FullName, Review FROM Restaurant WHERE FullName IN ("' + r1FullNames + '") AND NReviews>64;')
+
+    db.cursor.execute('SELECT FullName, Review FROM Restaurant WHERE FullName IN ("' + r1FullNames + '") AND NReviews>50;')
     r1Reviews = db.cursor.fetchall()
     r1Reviews = sorted(r1Reviews)
 
     db.cursor.execute('SELECT FullName, Review FROM Restaurant WHERE (FullName = "' + restaurant + '" OR Site = "' + restaurant + '");')
     r2Review = db.cursor.fetchone()
-    
+
     df = tf_idf(df, r1Reviews, r2Review)[:n_restaurants]
 
     restaurants = []
@@ -163,4 +169,4 @@ def predict_rest(restaurant, miles, zipcode):
     return restaurants
 
 if __name__=='__main__':
-    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "10", "Mountain View")
+    print predict_rest("State Bird Provisions 1529 Fillmore St San Francisco, CA 94115", "5", "90069")
