@@ -11,6 +11,7 @@ var restaurant_latlong = [];
 var parsedJson;
 
 var infowindow = new google.maps.InfoWindow();
+infowindow.setOptions({maxWidth: 500});
 var map;
 
 // Javascript to get restaurant from page
@@ -110,11 +111,14 @@ function drop() {
 	setAllMap(map)
 }
 
+
+
 function addMarker() {
-    var html = '<div id="infowindow">';
+    var html = '<div id="infowindow" style="width:170px">';
+    //var html = '<div id="infowindow">';
+    html += "<big><big>Most similar items:<br>" + parsedJson[iterator]["Words"] + "<br><br></big></big>"
     html += parsedJson[iterator]["Name"] + "<br>" + parsedJson[iterator]["Street"] + "<br>" + parsedJson[iterator]["City"] + "<br>"
     html += parsedJson[iterator]["Phone"] + "<br><a href=http://www.yelp.com" + parsedJson[iterator]["Site"] + " target='_blank'>See on yelp</a>"
-    html += "<br><br>Most similar items:<br>" + parsedJson[iterator]["Words"]
     html +='</div>';
     var image = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld='+parseInt(iterator+1) + '|FE6256|000000';
     console.log(image)
