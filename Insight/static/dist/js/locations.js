@@ -7,7 +7,6 @@ var longitude;
 var latitude;
 var location;
 
-var restaurant_latlong = [];
 var parsedJson;
 
 var infowindow = new google.maps.InfoWindow();
@@ -42,7 +41,6 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    max_lat = -999999.
 	    min_long = 999999.
 	    max_long = -999999.
-	    console.log(parsedJson.length)
 	    if (parsedJson.length==0) {
 		$('#output_results').val("No restaurants found. Currently OldFaveNewHood only supports Los Angeles and SF bay area (San Fran to San Jose to Oakland");
 		$('#output_results').html("No restaurants found. Currently OldFaveNewHood only supports Los Angeles and SF bay area (San Fran to San Jose to Oakland");
@@ -63,7 +61,7 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    console.log(avg_latitude + " " + avg_longitude)
 	    map.setCenter(new google.maps.LatLng(avg_latitude, avg_longitude));
 	    console.log(max_long)
-	    max_long = max_long + (max_long-min_long)*0.6
+	    max_long = max_long + (max_long-min_long)*0.8
 	    console.log(max_long)
 	    var bounds = new google.maps.LatLngBounds(new google.maps.LatLng(min_lat, min_long),new google.maps.LatLng(max_lat, max_long));
 	    map.fitBounds(bounds);
@@ -76,12 +74,7 @@ function getRestaurant(restaurant, zipcode, miles) {
 	});
 };
 
-function drawMaps(locations) {
-    google.maps.event.addDomListener(window, 'load', initialize(new google.maps.LatLng(avg_latitude, avg_longitude)));
-    drop()
-}
-
-function initialize(center) {
+function initialize() {
     geocoder = new google.maps.Geocoder();
     var mapOptions = {
 	center: new google.maps.LatLng(37.7712, -122.4413),
@@ -91,18 +84,7 @@ function initialize(center) {
     console.log('Besflkdadf')
 }
       
-function createMarkerlist(){
-    console.log("Creating markers")
-    console.log(parsedJson.length)
-	//for(var i = 0; i < parsedJson.length; i++) {
-	//console.log("Latitude " + parsedJson[i]["Latitude"] + " Longitude " + parsedJson[i]["Lxongitude"])
-	    //restaurant_latlong.push(new google.maps.LatLng(parsedJson[i]["Latitude"], parsedJson[i]["Longitude"]))
-	//}
-    console.log("Creating new Marker List")
-	}
-      
 function drop() {
-        createMarkerlist()
         for (var i = 0; i < parsedJson.length; i++) {
 	    setTimeout(function() {
 		    addMarker(i);
@@ -115,7 +97,6 @@ function drop() {
 
 function addMarker() {
     var html = '<div id="infowindow" style="width:170px">';
-    //var html = '<div id="infowindow">';
     html += "<big><big>Most similar items:<br>" + parsedJson[iterator]["Words"] + "<br><br></big></big>"
     html += parsedJson[iterator]["Name"] + "<br>" + parsedJson[iterator]["Street"] + "<br>" + parsedJson[iterator]["City"] + "<br>"
     html += parsedJson[iterator]["Phone"] + "<br><a href=http://www.yelp.com" + parsedJson[iterator]["Site"] + " target='_blank'>See on yelp</a>"
@@ -124,7 +105,6 @@ function addMarker() {
     console.log(image)
     var marker = new google.maps.Marker({
 	    position: new google.maps.LatLng(parsedJson[iterator]["Latitude"], parsedJson[iterator]["Longitude"]),
-	    //position: restaurant_latlong[iterator],
 	    map: map,
 	    draggable: false,
 	    icon: image,
@@ -149,7 +129,6 @@ function clearMarkers() {
 function deleteMarkers() {
     clearMarkers();
     parsedJson = []
-	//restaurant_latlong = [];
     markers = [];
     iterator = 0;
     console.log("Deleting markers")
@@ -160,7 +139,6 @@ function setAllMap(map) {
 	markers[i].setMap(map);
     }
 }
-google.maps.event.addDomListener(window, 'load', initialize);
 
 function showSearchPane() {
     document.getElementById('results').style.visibility='visible';
