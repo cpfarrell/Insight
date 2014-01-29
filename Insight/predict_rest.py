@@ -85,6 +85,11 @@ def tf_idf(df, r1Reviews, r2Review):
     df = df.sort('similarity', ascending=False).reset_index()
     return df
 
+def add_links(max_words, site):
+    words_list = max_words.split('<br>')
+    words_list = ['<a href=http://www.yelp.com' + site + '?q=' + '+'.join(word.split()) + ' target="_blank">' + word + '</a>' for word in words_list]
+    return '<br>'.join(words_list)
+
 def add_sent(df, r1Reviews):
     print len(df)
     for line in range(len(df)):
@@ -136,12 +141,11 @@ def predict_rest(restaurant, miles, zipcode):
     logistic = joblib.load("data/logit.joblib.pkl")
     df['scores'] = logistic.decision_function(X)
     df = df.sort('scores', ascending=False).reset_index()
-    print "Matches" + str(len(df.ix[df['scores']>0]))
+
     keep = max(20, len(df.ix[df['scores']>0]))
     keep = max(5, keep)
     keep = min(keep, len(df))
-    print 'Keep ' + str(keep)
-    print len(df)
+    print keep
     df = df.ix[range(keep),:]
     #df=df.ix[df['scores']>4]
 
@@ -162,9 +166,12 @@ def predict_rest(restaurant, miles, zipcode):
 
     restaurants = []
     for i in range(n_restaurants):
-        restaurants.append({'Name' :df.ix[i, 'r1Name'], 'Words': df.ix[i, 'max_words'],
+        max_words = df.ix[i, 'max_words']
+        site = df.ix[i, 'r1Site']
+        max_words = add_links(max_words, site)
+        restaurants.append({'Name' :df.ix[i, 'r1Name'], 'Words': max_words,
                             'Street': df.ix[i, 'r1Street'], 'City': df.ix[i, 'r1City'] + ', ' + df.ix[i, 'r1State'] + ' ' + df.ix[i, 'r1Zip'],  'Phone': df.ix[i, 'r1Phone'],
-                            'Site': df.ix[i, 'r1Site'], 'Latitude': df.ix[i, 'Latitude'], 'Longitude': df.ix[i, 'Longitude']})
+                            'Site': site, 'Latitude': df.ix[i, 'Latitude'], 'Longitude': df.ix[i, 'Longitude']})
 
     return restaurants
 
