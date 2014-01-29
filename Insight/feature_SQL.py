@@ -63,7 +63,7 @@ def main():
 
     attrs = ['Alcohol', 'HasTV', 'NoiseLevel', 'RestaurantsAttire', 'BusinessAcceptsCreditCards', 'Ambience', 'RestaurantsGoodForGroups', 'Caters', 'WiFi', 'RestaurantsReservations', 'RestaurantsTakeOut', 'GoodForKids', 'WheelchairAccessible', 'RestaurantsTableService', 'OutdoorSeating', 'RestaurantsPriceRange2', 'RestaurantsDelivery', 'GoodForMeal', 'BusinessParking']
 
-    db_sql = sql_database.DbAccess('YELP', usr='root')
+    db_sql = sql_database.DbAccess('INSIGHT', usr='root')
     db_sql.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
 
     Columns = 'Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200), Phone CHAR(50), Site CHAR(100), PictureUrl CHAR(150),'

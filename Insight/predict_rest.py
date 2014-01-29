@@ -15,12 +15,12 @@ import nltk
 #My modules
 import helper
 import sql_database
-db = sql_database.DbAccess('YELP', usr='root')
+db = sql_database.DbAccess('INSIGHT', usr='root')
 afinn = dict(map(lambda (k,v): (k,int(v)), [ line.split('\t') for line in open("data/AFINN-111.txt") ]))
 
 stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcombiz', 'food', 'place', 'dish', 'good', 'newsentencebegin', 'NEWREVIEW', 'newreview', 'like',
               'really', 'great', 'menu', 'restaurant', 'santa', 'monica', 'groupon', 'happy', 'hour', 'tony', 'rag', 'httpwwwyelpcomuser', 'waitress', 'valet', 'michelin'
-              , 'james', 'beard']
+              , 'james', 'beard', 'del']
 
 n_restaurants = 5
 

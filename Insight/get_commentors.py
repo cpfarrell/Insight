@@ -16,7 +16,7 @@ db_mongo = client.yelp_database
 posts = db_mongo.posts
 rests_info = posts.find()
 
-sql_db = sql_database.DbAccess('YELP', usr='root')
+sql_db = sql_database.DbAccess('INSIGHT', usr='root')
 
 count = 0
 

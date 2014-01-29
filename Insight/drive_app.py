@@ -13,7 +13,7 @@ import helper
 import sql_database
 import predict_rest
 
-db = sql_database.DbAccess('YELP', usr='root')
+db = sql_database.DbAccess('INSIGHT', usr='root')
 app = Flask(__name__)
 app.debug = True
 

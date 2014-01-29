@@ -7,7 +7,7 @@ import pandas
 import sql_database
 import predict_rest
 
-db = sql_database.DbAccess('YELP', usr='root')
+db = sql_database.DbAccess('INSIGHT', usr='root')
 
 sql = ("SELECT DISTINCT SoCalRest FROM Review")
 db.cursor.execute(sql)

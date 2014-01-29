@@ -42,8 +42,8 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    min_long = 999999.
 	    max_long = -999999.
 	    if (parsedJson.length==0) {
-		$('#output_results').val("No restaurants found. Currently OldFaveNewHood only supports Los Angeles and SF bay area (San Fran to San Jose to Oakland");
-		$('#output_results').html("No restaurants found. Currently OldFaveNewHood only supports Los Angeles and SF bay area (San Fran to San Jose to Oakland");
+		$('#output_results').val("No restaurants found. Currently OldFaveNewPlace only supports SF bay area (San Fran to San Jose to Oakland), Los Angeles, and New York City");
+		$('#output_results').html("No restaurants found. Currently OldFaveNewPlace only supports SF bay area (San Fran to San Jose to Oakland, Los Angeles, and New York City");
 		return result
 	    }
 
@@ -96,8 +96,8 @@ function drop() {
 
 
 function addMarker() {
-    var html = '<div id="infowindow" style="width:170px">';
-    html += "<big><big>Most similar items:<br>" + parsedJson[iterator]["Words"] + "<br><br></big></big>"
+    var html = '<div id="infowindow" style="width:190px">';
+    html += "<big><big>Most similar:<br>" + parsedJson[iterator]["Words"] + "<br><br></big></big>"
     html += parsedJson[iterator]["Name"] + "<br>" + parsedJson[iterator]["Street"] + "<br>" + parsedJson[iterator]["City"] + "<br>"
     html += parsedJson[iterator]["Phone"] + "<br><a href=http://www.yelp.com" + parsedJson[iterator]["Site"] + " target='_blank'>See on yelp</a>"
     html +='</div>';
