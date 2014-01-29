@@ -66,7 +66,7 @@ def tf_idf(df, r1Reviews, r2Review):
     r2 = tfidf_counts[-1,:]
     r1 = tfidf_counts[range(tfidf_counts.shape[0]-1),:]
 
-    product = r1.multiply(r2).todense()
+    product = np.multiply(r1.todense(), r2.todense())
     cosine = r1.dot(r2.transpose()).todense()
     #cosine = np.sum(product)
     lengths = np.sqrt(r1.multiply(r1).sum(axis=1))
