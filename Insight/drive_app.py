@@ -1,4 +1,5 @@
 import json
+import ast
 
 #Third party modules
 from flask import Flask, render_template, request
@@ -33,7 +34,20 @@ def restaurant():
     restaurant = request.args.get("restaurant", "")
     miles = request.args.get("miles", '')
     zipcode = request.args.get("zipcode", "")
-    return json.dumps(predict_rest.predict_rest(restaurant, miles, zipcode))
+
+    query = restaurant + " " + miles + " " + zipcode
+    sql = ('SELECT Result FROM Cached WHERE Query = "' + query + '";')
+    db.cursor.execute(sql)
+    results = db.cursor.fetchall()
+    if len(results)>0:
+        result = ast.literal_eval(results[0][0])
+    else:
+        result = predict_rest.predict_rest(restaurant, miles, zipcode)
+        sql = ('INSERT INTO Cached (Query, Result) VALUES ("' + query + '", %s);')
+        db.cursor.execute(sql, (str(result),))
+        db.commit()
+
+    return json.dumps(result)
 
 def list_restaurants():
     q = request.args.get('q')
