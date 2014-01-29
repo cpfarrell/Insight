@@ -87,7 +87,7 @@ def tf_idf(df, r1Reviews, r2Review):
 
 def add_links(max_words, site):
     words_list = max_words.split('<br>')
-    words_list = ['<a href=http://www.yelp.com' + site + '?q=' + '+'.join(word.split()) + ' target="_blank">' + word + '</a>' for word in words_list]
+    words_list = ['<a href=http://www.yelp.com' + site + '?q=' + '+'.join(word.split()) + ' target="_blank"><big><big>' + word + '</big></big></a>' for word in words_list]
     return '<br>'.join(words_list)
 
 def add_sent(df, r1Reviews):
