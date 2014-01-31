@@ -2,29 +2,34 @@
 
 {% block head %}
 <style>
-body { background: white url("static/img/food_dimmed.jpg") no-repeat fixed top center;}
+body { background: white url("static/img/squid_ink_pasta.jpg") no-repeat fixed top center; background-size: 100%;}
 </style> 
 
 <style type="text/css">
 <link href="static/dist/css/bootstrap.css" rel="stylesheet">
 <link href="static/dist/css/starter-template.css" rel="stylesheet">
-
 </style>
 
 {% endblock %}
 
 {% block content %}
+
 <!--- <div class="starter-template" style="color:blue; background-color: white; width: 48%; margin-top: 3%; margin-left: 26%; padding-top: 1px; padding-bottom: 10px;
-				     border-style:solid; border-width:5px; border-color: black" --->
+				     border-style:solid; border-width:5px; border-color: black" 
 <div class="starter-template" style="background-image: url(static/img/back_hatch.png); background-size: 4px 4px;
 				     color:blue; background-color: white; width: 100%; margin-top: -2%; padding-top: 6px; padding-bottom: 1px">
   <big><big>
     <h1><center><font size="7">OldFaveNewPlace</font></center></h1>
     <p class="lead"><center>Same favorite restaurant, new location</center></p>
       </big></big>
-</div>
+</div> --->
 
-<div class="jumbotron" style="position:absolute; width:48%; margin-left: 26%; margin-top: 12%; padding-top: 3px; padding-bottom: 1px">
+<p style="margin-left:27%; margin-top: 0px">
+  <img src="static/img/logo_tagline.png" style="width: 60%">
+</p>
+
+<div class="jumbotron" style="position:absolute; width:32%; margin-left: 34%; margin-top: 8%; padding-top: 3px; padding-bottom: 1px; border-radius:15px; -moz-border-radius:15px;
+			      border-color:rgb(6,71,32); border-style:solid; border-width:5px;">
 <!--- <div id="control_panel"> --->
 <!---     <form autocomplete="on"> --->
       <!--- Find a restaurant like --->
@@ -32,7 +37,7 @@ body { background: white url("static/img/food_dimmed.jpg") no-repeat fixed top c
       <small>
       <center>
 	Restaurant you wish you could go to<br>
-      <input type="text" id="restaurant_name" placeholder="Old restaurant" class="form-control" size="40">
+      <input type="text" id="restaurant_name" placeholder="Old restaurant" class="form-control" size="40;">
       <br>Where you actually are<br>
       <!--- <input id="restaurant_name" type="text" placeholder="Restaurant" size="30" autocomplete="on"> --->
       <!--- <br>within --->
@@ -42,8 +47,8 @@ body { background: white url("static/img/food_dimmed.jpg") no-repeat fixed top c
       <!--- miles of --->
       <!--- Box where user inputs zip code, has name zipcode --->
       <span>
-      <input type="text" id="zipcode" placeholder="Street address, city, or zip code" class="form-control" size="40">
-      <input type="text" id="miles"   placeholder="Miles" class="form-control" size="3"><br>
+      <input type="text" id="zipcode" placeholder="Street address, city, or zip code" class="form-control" size="34%">
+      <input type="text" id="miles"   placeholder="Miles" class="form-control" size="3%"><br>
       </span>
       <!--- Button which starts collection of data from above forms --->
       <button type="button" class="btn btn-default" id="find_button" href="maps" size="40">Search</button>

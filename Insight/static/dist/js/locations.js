@@ -97,7 +97,7 @@ function drop() {
 
 function addMarker() {
     var html = '<div id="infowindow" style="width:190px">';
-    html += "<big><big>Most similar:<br>" + parsedJson[iterator]["Words"] + "<br><br></big></big>"
+    html += "<big><big>Similar items:<br>" + parsedJson[iterator]["Words"] + "<br><br></big></big>"
     html += parsedJson[iterator]["Name"] + "<br>" + parsedJson[iterator]["Street"] + "<br>" + parsedJson[iterator]["City"] + "<br>"
     html += parsedJson[iterator]["Phone"] + "<br><a href=http://www.yelp.com" + parsedJson[iterator]["Site"] + " target='_blank'>See on yelp</a>"
     html +='</div>';

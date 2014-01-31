@@ -41,6 +41,7 @@
       #map-canvas {height: 100%; margin: 0px; float: right; width: 100%; margin-top: 0px;}
       <!--- #map-canvas img { width:auto; display:inline; max-width:none; line-height:normal; } --->
       #results { height: 85%; margin: 0px; float: left; width: 25%; margin-top: 50px; margin-left: 15px }
+
       </style>
       {% block style %}{% endblock %}
 
@@ -62,7 +63,9 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">OldFaveNewPlace</a>
+          <a class="navbar-brand" href="/">
+	    <img src="static/img/logo.png" style="height:50px; margin-top: -15px">
+	  </a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
