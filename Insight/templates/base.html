@@ -32,7 +32,13 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
-      font-family: 'Love Ya Like A Sister', cursive;
+      @font-face {
+      font-family: Chalk;
+      src: url("static/fonts/whatever_it_takes.ttf");
+      font-weight:400;
+      }
+
+      font-family: 'Love Ya Like A Sister', cursive, Chalk;
       html, body {
       height: 100%;
       margin: 0px;
@@ -41,6 +47,8 @@
       #map-canvas {height: 100%; margin: 0px; float: right; width: 100%; margin-top: 0px;}
       <!--- #map-canvas img { width:auto; display:inline; max-width:none; line-height:normal; } --->
       #results { height: 85%; margin: 0px; float: left; width: 25%; margin-top: 50px; margin-left: 15px }
+
+      }
 
       </style>
       {% block style %}{% endblock %}
@@ -71,7 +79,7 @@
           <ul class="nav navbar-nav">
             <li class="active"><a href="/">Home</a></li>
             <li class="active"><a href="http://slid.es/cpfarrell/oldfavenewhood" target="_blank">About</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li class="active"><a href="https://github.com/cpfarrell/Insight/tree/master/Insight" target="_blank">GitHub</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>

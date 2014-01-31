@@ -22,18 +22,19 @@ img {
 
 {% block content %}
 <div>
-  <div class="jumbotron" id="output_results" style="width:35%; float:right; margin-left: 68%; margin-top: 6%; padding: 10px; padding-top: 1px; z-index: 11; position:absolute;
-						    background: transparent; color: #fffef9; font-family: 'Love Ya Like A Sister' !important; height: 50%">
+  <div class="jumbotron" id="output_results" style="width:23%; float:right; margin-left: 70%; margin-top: 6%; padding: 10px; padding-top: 1px; z-index: 11; position:absolute;
+						    background: transparent; color: #fffef9; font-family: 'Chalk' !important;
+						    background-image: url(static/img/CutPicture.com_2014-Jan-24_03_56_39.jpg); background-size: cover;">
     Top Restaurants:
   </div>
 </div>
 
-
+<!---
 <div>
   <img src="static/img/CutPicture.com_2014-Jan-24_03_56_39.jpg" style="height: 70%; width:32%; float:right; margin-left: 68%; margin-top: 6%; 
 	padding: 5px; padding-top: 1px; z-index: 8; position:absolute;">
 </div>
-
+--->
 
 <button id="NewSearch" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" style="z-index:14; position:fixed; margin-left:100px; bottom:10px;
 													background-color: rgb(6,71,32); color:white; border-color: rgb(6,71,32);">
@@ -48,7 +49,7 @@ img {
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">New search</h4>
+        <h4 class="modal-title" id="myModalLabel">Find your favorite restaurant in a new place</h4>
       </div>
       <div class="modal-body">
 	Old Favorite<br>
@@ -59,7 +60,7 @@ img {
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" id="find_button" class="btn btn-primary" data-dismiss="modal">New search</button>
+        <button type="button" id="find_button" class="btn btn-primary" data-dismiss="modal"; style="background-color: rgb(6,71,32)";>New search</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

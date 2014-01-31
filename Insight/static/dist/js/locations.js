@@ -32,7 +32,7 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    parsedJson = eval(result);
 	    console.log("The output" + parsedJson)
 	    console.log(parsedJson)
-	    names = "Top Restaurants:<br>"
+	    names = "<big>Top Restaurants:<br>"
 		//coordinates = []
 	    avg_latitude = 0
 	    avg_longitude = 0
@@ -67,8 +67,8 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    map.fitBounds(bounds);
 
 	    drop()
-	    $('#output_results').val(names);
-	    $('#output_results').html(names);
+	    $('#output_results').val(names + "</big>");
+	    $('#output_results').html(names + "</big>");
 	    //I don't think this returned value is used at all
 	    return result;
 	});
@@ -96,7 +96,7 @@ function drop() {
 
 
 function addMarker() {
-    var html = '<div id="infowindow" style="width:190px">';
+    var html = '<div id="infowindow" style="width:170px">';
     html += "<big><big>Similar items:<br>" + parsedJson[iterator]["Words"] + "<br><br></big></big>"
     html += parsedJson[iterator]["Name"] + "<br>" + parsedJson[iterator]["Street"] + "<br>" + parsedJson[iterator]["City"] + "<br>"
     html += parsedJson[iterator]["Phone"] + "<br><a href=http://www.yelp.com" + parsedJson[iterator]["Site"] + " target='_blank'>See on yelp</a>"
