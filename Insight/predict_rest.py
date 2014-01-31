@@ -143,7 +143,7 @@ def predict_rest(restaurant, miles, zipcode):
     df = df.sort('scores', ascending=False).reset_index()
 
     keep = max(20, len(df.ix[df['scores']>0]))
-    keep = max(5, keep)
+    keep = min(400, keep)
     keep = min(keep, len(df))
     print keep
     df = df.ix[range(keep),:]
