@@ -57,11 +57,11 @@ def tf_idf(df, r1Reviews, r2Review):
     Reviews.append(r2Review)
     Reviews = [Review[1] for Review in Reviews]
 
-    vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=1.0, stop_words='english', ngram_range=(1,2))
+    vectorizer = TfidfVectorizer(max_df=1.0, stop_words='english', ngram_range=(1,2))
     r2_ngrams = vectorizer.fit(r2Review).get_feature_names()
     r2_ngrams = [ngram for ngram in r2_ngrams if not any(word in stop_words for word in ngram.split())]    
 
-    vectorizer = TfidfVectorizer(sublinear_tf=True, max_df=1.0, stop_words='english', ngram_range=(1,2), vocabulary=r2_ngrams)
+    vectorizer = TfidfVectorizer(max_df=1.0, stop_words='english', ngram_range=(1,2), vocabulary=r2_ngrams)
     tfidf_counts = vectorizer.fit_transform(Reviews)
     r2 = tfidf_counts[-1,:]
     r1 = tfidf_counts[range(tfidf_counts.shape[0]-1),:]
