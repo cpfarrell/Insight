@@ -147,7 +147,6 @@ def predict_rest(restaurant, miles, zipcode):
     keep = min(keep, len(df))
     print keep
     df = df.ix[range(keep),:]
-    #df=df.ix[df['scores']>4]
 
     #Sort by name to keep aligned
     df = df.sort('r1FullName')
