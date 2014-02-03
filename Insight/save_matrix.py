@@ -111,19 +111,23 @@ def build_matrix(df):
                 col.append(word_tokens[token])
                 data.append(tokens[token])
 
-    np.savetxt('data/word_data.txt', data)
-    np.savetxt('data/word_row.txt', row)
-    np.savetxt('data/word_col.txt', col)
+#    np.savetxt('data/word_data.txt', data)
+#    np.savetxt('data/word_row.txt', row)
+#    np.savetxt('data/word_col.txt', col)
 
     #X = coo_matrix((data,(row,col)))
 
-    #print "Done creating matrix"
-    #X = X.tocsr()
-    #print "Writing to pickle"
-    #np.savetxt('data/word_matrix.txt', X)
+    print "Writing data to pickle"
+    with open('data/word_data.pkl', 'wb') as fid:
+        cPickle.dump(data, fid)
 
-#    with open('data/word_matrix.pkl', 'wb') as fid:
-#        cPickle.dump(X, fid)
+    print "Writing row to pickle"
+    with open('data/word_row.pkl', 'wb') as fid:
+        cPickle.dump(row, fid)
+
+    print "Writing col to pickle"
+    with open('data/word_col.pkl', 'wb') as fid:
+        cPickle.dump(col, fid)
 
 if __name__=='__main__':
     print "Loading reviews"

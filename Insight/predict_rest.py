@@ -1,6 +1,7 @@
 #Standard modules
 import json
 from collections import defaultdict
+import cPickle
 
 #Third party modules
 from pandas import DataFrame
@@ -23,6 +24,23 @@ stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcom
               , 'james', 'beard', 'del']
 
 n_restaurants = 5
+print "Loading data"
+with open('data/word_data.pkl') as fid:
+    data = cPickle.load(fid)
+
+print "Loading row"
+with open('data/word_row.pkl') as fid:
+    row = cPickle.load(fid)
+
+print "Loading column"
+with open('data/word_col.pkl') as fid:
+    col = cPickle.load(fid)
+
+print "Building matrix"
+X = coo_matrix((data,(row,col))) 
+print "Converting matrix"
+X = X.tocsr()
+print "Done"
 
 def word_match(word1, word2):
     if any([any(nltk.metrics.edit_distance(s_word1, s_word2)<3 for s_word2 in word2.split()) for s_word1 in word1.split()]):
