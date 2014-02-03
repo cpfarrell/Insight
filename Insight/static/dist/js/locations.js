@@ -41,9 +41,11 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    max_lat = -999999.
 	    min_long = 999999.
 	    max_long = -999999.
-	    if (parsedJson.length==0) {
-		$('#output_results').val("No restaurants found. Currently OldFaveNewPlace only supports SF bay area (San Fran to San Jose to Oakland), Los Angeles, and New York City");
-		$('#output_results').html("No restaurants found. Currently OldFaveNewPlace only supports SF bay area (San Fran to San Jose to Oakland, Los Angeles, and New York City");
+	    console.log("The result length is " + parsedJson.length)
+	    if (parsedJson.length<2) {
+		$('#output_results').val("No restaurants found. Currently OldFaveNewPlace only supports SF bay area (San Fran to San Jose to Oakland), Los Ang");
+		//$('#output_results').html("No restaurants found. Currently OldFaveNewPlace only supports SF bay area (San Fran to San Jose to Oakland, Los AngYork City");
+		$('#output_results').html(parsedJson[0]);
 		return result
 	    }
 

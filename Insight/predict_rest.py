@@ -24,23 +24,23 @@ stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcom
               , 'james', 'beard', 'del']
 
 n_restaurants = 5
-print "Loading data"
-with open('data/word_data.pkl') as fid:
-    data = cPickle.load(fid)
+#print "Loading data"
+#with open('data/word_data.pkl') as fid:
+#    data = cPickle.load(fid)
 
-print "Loading row"
-with open('data/word_row.pkl') as fid:
-    row = cPickle.load(fid)
+#print "Loading row"
+#with open('data/word_row.pkl') as fid:
+#    row = cPickle.load(fid)
 
-print "Loading column"
-with open('data/word_col.pkl') as fid:
-    col = cPickle.load(fid)
+#print "Loading column"
+#with open('data/word_col.pkl') as fid:
+#    col = cPickle.load(fid)
 
-print "Building matrix"
-X = coo_matrix((data,(row,col))) 
-print "Converting matrix"
-X = X.tocsr()
-print "Done"
+#print "Building matrix"
+#X = coo_matrix((data,(row,col))) 
+#print "Converting matrix"
+#X = X.tocsr()
+#print "Done"
 
 def word_match(word1, word2):
     if any([any(nltk.metrics.edit_distance(s_word1, s_word2)<3 for s_word2 in word2.split()) for s_word1 in word1.split()]):
@@ -135,9 +135,18 @@ def afinn_score(mw, sents):
     return 0
 
 def predict_rest(restaurant, miles, zipcode):
-    results = Geocoder.geocode(zipcode)
+    try:
+        results = Geocoder.geocode(zipcode)
+    except:
+        return ["I couldn't recognize that address. Could you enter another one?"]
+
     latitude = str(results[0].coordinates[0])
     longitude = str(results[0].coordinates[1])
+
+    try:
+        float(miles)
+    except ValueError:
+        return ["Please enter a number into the miles field"]
 
     df = pandas.io.sql.read_frame('''
      SELECT r1.Name as r1Name, r1.FullName as r1FullName, r1.RestaurantType as r1Type, r1.Site as r1Site, 
@@ -150,7 +159,15 @@ def predict_rest(restaurant, miles, zipcode):
      AND r2.FullName = "''' + restaurant + '''" AND r1.NReviews > 0;'''
                                   , db.cnx)
     if len(df)==0:
-        return []
+        sql = ('SELECT FullName FROM Restaurant WHERE FullName = "' + restaurant + '";')
+        db.cursor.execute(sql)
+        n_rests = len(db.cursor.fetchall())
+        
+        print n_rests
+        if n_rests==0:
+            return ["I don't know the restaurant " + restaurant + ". How about using one from autosuggest?"]
+        else:
+            return ["No restaurants were found in this area. Currently OldFaveNewPlace only has restaurants in the SF Bay Area, Los Angeles, and New York City"]
     
     df = helper.transform(df)
     print len(df)
@@ -171,16 +188,16 @@ def predict_rest(restaurant, miles, zipcode):
     print len(df)
     #Grab reviews from those restaurants. Python sort instead of SQL ORDER BY because of different treatment of capitalized letters
     r1FullNames = '", "'.join(df['r1FullName'].tolist())
-
+    print 'DEBUG1'
     db.cursor.execute('SELECT FullName, Review FROM Restaurant WHERE FullName IN ("' + r1FullNames + '") AND NReviews>0;')
     r1Reviews = db.cursor.fetchall()
     r1Reviews = sorted(r1Reviews)
-
-    db.cursor.execute('SELECT FullName, Review FROM Restaurant WHERE (FullName = "' + restaurant + '" OR Site = "' + restaurant + '");')
+    print 'DEBUG2'
+    db.cursor.execute('SELECT FullName, Review FROM Restaurant WHERE (FullName = "' + restaurant + '");')
     r2Review = db.cursor.fetchone()
-
+    print "Test"
     df = tf_idf(df, r1Reviews, r2Review)[:n_restaurants]
-
+    print "Test2"
     restaurants = []
     for i in range(n_restaurants):
         max_words = df.ix[i, 'max_words']
@@ -193,4 +210,5 @@ def predict_rest(restaurant, miles, zipcode):
     return restaurants
 
 if __name__=='__main__':
-    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", "San Francisco")
+#    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", "San Francisco")
+    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", "Anahiem, Ca")
