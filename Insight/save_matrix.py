@@ -11,6 +11,7 @@ import pandas
 from scipy.sparse import *
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
+import numpy as np
 
 import stopwords
 sw = stopwords.StopWords()
@@ -110,14 +111,19 @@ def build_matrix(df):
                 col.append(word_tokens[token])
                 data.append(tokens[token])
 
-    X = coo_matrix((data,(row,col)))
+    np.savetxt('data/word_data.txt', data)
+    np.savetxt('data/word_row.txt', row)
+    np.savetxt('data/word_col.txt', col)
 
-    print "Done creating matrix"
-    X = X.tocsr()
-    print "Writing to pickle"
+    #X = coo_matrix((data,(row,col)))
 
-    with open('data/word_matrix.pkl', 'wb') as fid:
-        cPickle.dump(X, fid)
+    #print "Done creating matrix"
+    #X = X.tocsr()
+    #print "Writing to pickle"
+    #np.savetxt('data/word_matrix.txt', X)
+
+#    with open('data/word_matrix.pkl', 'wb') as fid:
+#        cPickle.dump(X, fid)
 
 if __name__=='__main__':
     print "Loading reviews"
