@@ -67,7 +67,7 @@ function getRestaurant(restaurant, zipcode, miles) {
 	    console.log(max_long)
 	    var bounds = new google.maps.LatLngBounds(new google.maps.LatLng(min_lat, min_long),new google.maps.LatLng(max_lat, max_long));
 	    map.fitBounds(bounds);
-
+	    document.getElementById("spinnerContainer").style.visibility = "hidden";
 	    drop()
 	    $('#output_results').val(names + "</big>");
 	    $('#output_results').html(names + "</big>");

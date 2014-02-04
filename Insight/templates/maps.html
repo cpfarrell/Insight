@@ -29,20 +29,20 @@ img {
   </div>
 </div>
 
-<!---
-<div>
-  <img src="static/img/CutPicture.com_2014-Jan-24_03_56_39.jpg" style="height: 70%; width:32%; float:right; margin-left: 68%; margin-top: 6%; 
-	padding: 5px; padding-top: 1px; z-index: 8; position:absolute;">
-</div>
---->
-
 <button id="NewSearch" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal" style="z-index:14; position:fixed; margin-left:100px; bottom:10px;
 													background-color: rgb(6,71,32); color:white; border-color: rgb(6,71,32);">
   New search
 </button>
 
-<div id="map-canvas" style="position:absolute; z-index: 5"></div> 
+<div id="map-canvas" style="position:absolute; z-index: 5"></div>
 
+<div id="spinnerContainer" class="spinner" style="margin-left:0%; margin-top:20%;background-color: Blue; color: Blue; visibility: hidden">
+</div>
+
+<!---<div id="jumbotron" style="position:absolute; z-index: 50000; width:70%; height:70%; float:right; margin-left: 20%; margin-top: 6%; padding: 10px; background-color:yellow;">
+Finding you the most similar restaurants.<br>This normally takes 10-15 seconds
+</div> 
+--->
 
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -67,13 +67,15 @@ img {
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<div class="load_modal"><!-- Place at bottom of page --></div>
+
 {% endblock %}
 
 {% block scripts %}
 <script src="static/dist/js/locations.js"></script>
 <script>
   var height = $('#map-canvas').height()
-  document.getElementById('map-canvas').style.height = (height - 50) + 'px';
+  document.getElementById("map-canvas").style.height = (height - 50) + 'px';
   //document.getElementById('map-canvas').style.height = document.getElementById('map-canvas').style.height - 50px
     // Search send (press enter) - jquery
     // Wait til page load is ready
@@ -81,6 +83,7 @@ img {
       console.log( "ready!" );
       console.log("{{restaurant}}")
       initialize()
+      document.getElementById("spinnerContainer").style.visibility = "visible";
       getRestaurant("{{restaurant}}", "{{zipcode}}", "{{miles}}");
       //readInfo({{latitudes}}, {{longitudes}})
       //When the button with id find_button is clicked then do these actions
@@ -91,6 +94,7 @@ img {
          var miles = $('#miles').val();
          var zipcode = $('#zipcode').val();
          //Call the getRestaurant function in data.js with the input values
+         document.getElementById("spinnerContainer").style.visibility = "visible";
          getRestaurant(restaurant, zipcode, miles);
       });
     });
@@ -111,4 +115,30 @@ img {
     limit: 10
   });
 </script>
+
+<script src="static/dist/js/spin.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var opts = {
+      lines: 13, // The number of lines to draw
+      length: 18, // The length of each line
+      width: 6, // The line thickness
+      radius: 10, // The radius of the inner circle
+      corners: 1, // Corner roundness (0..1)
+      rotate: 0, // The rotation offset
+      color: 'blue', // #rgb or #rrggbb
+      speed: 1, // Rounds per second
+      trail: 60, // Afterglow percentage
+      shadow: false, // Whether to render a shadow
+      hwaccel: false, // Whether to use hardware acceleration
+      className: 'spinner', // The CSS class to assign to the spinner
+      zIndex: 2e9, // The z-index (defaults to 2000000000)
+      top: 'auto', // Top position relative to parent in px
+      left: 'auto' // Left position relative to parent in px
+    };
+    var target = document.getElementById('spinnerContainer');
+    var spinner = new Spinner(opts).spin(target);
+</script>
+
+
+
 {% endblock %}
