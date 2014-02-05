@@ -10,6 +10,8 @@ class DbAccess(object):
         self.db_url = "localhost"
         self.connect(usr, pwd)
         self.cursor = self.cnx.cursor()
+        self.cursor.execute("SET global wait_timeout=30000000;")
+        self.cursor.execute("SET session wait_timeout=30000000;")
 
     def connect(self, usr, pwd=None):
         """Try to connect to DB
