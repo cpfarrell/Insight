@@ -46,6 +46,7 @@ function getRestaurant(restaurant, zipcode, miles) {
 		$('#output_results').val("No restaurants found. Currently OldFaveNewPlace only supports SF bay area (San Fran to San Jose to Oakland), Los Ang");
 		//$('#output_results').html("No restaurants found. Currently OldFaveNewPlace only supports SF bay area (San Fran to San Jose to Oakland, Los AngYork City");
 		$('#output_results').html(parsedJson[0]);
+		document.getElementById("spinnerContainer").style.visibility = "hidden";
 		return result
 	    }
 
