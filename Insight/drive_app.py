@@ -35,6 +35,11 @@ def restaurant():
     miles = request.args.get("miles", '')
     zipcode = request.args.get("zipcode", "")
 
+    try:
+        miles = str(int(float(miles)))
+    except ValueError:
+        return json.dumps(["Please enter a number into the miles field"])
+
     query = restaurant + " " + miles + " " + zipcode
     sql = ('SELECT Result FROM Cached WHERE Query = "' + query + '";')
     db.cursor.execute(sql)

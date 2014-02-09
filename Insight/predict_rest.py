@@ -26,7 +26,7 @@ stop_words = ['west', 'east', 'north', 'south', 'mission', 'la', 'httpwwwyelpcom
 n_restaurants = 5
 
 def word_match(word1, word2):
-    if any([any(nltk.metrics.edit_distance(s_word1, s_word2)<3 for s_word2 in word2.split()) for s_word1 in word1.split()]):
+    if any([any(nltk.metrics.edit_distance(s_word1, s_word2)<3 or s_word1 in s_word2 or s_word2 in s_word1 for s_word2 in word2.split()) for s_word1 in word1.split()]):
         return True
     return False
 
@@ -91,32 +91,6 @@ def add_links(max_words, site):
     words_list = ['<a href=http://www.yelp.com' + site + '?q=' + '+'.join(word.split()) + ' target="_blank"><big><big>' + word + '</big></big></a>' for word in words_list]
     return '<br>'.join(words_list)
 
-def add_sent(df, r1Reviews):
-    print len(df)
-    for line in range(len(df)):
-        review = [r1[1] for r1 in r1Reviews if r1[0]==df.ix[line, 'r1FullName']][0]
-        sents = []
-        reviews = review.split('NEWREVIEW')
-        for review in reviews:
-            sents.extend(review.split('newsentencebegin'))
-        mws = df.ix[line, 'max_words'].split("<br>")
-        for mw in mws:
-            print mw + ' ' + str(afinn_score(mw, sents))
-
-def afinn_score(mw, sents):
-    count = 0
-    afinn_score = 0
-    for sent in sents:
-        words = sent.split()
-        if mw in words:
-            for word in words:
-                if word in afinn:
-                    afinn_score += afinn[word]
-                    count += 1.
-    if count > 0:
-        return float(afinn_score)/count
-    return 0
-
 def predict_rest(restaurant, miles, zipcode):
     try:
         results = Geocoder.geocode(zipcode)
@@ -146,7 +120,6 @@ def predict_rest(restaurant, miles, zipcode):
         db.cursor.execute(sql)
         n_rests = len(db.cursor.fetchall())
         
-        print n_rests
         if n_rests==0:
             return ["I don't know the restaurant " + restaurant + ". How about using one from autosuggest?"]
         else:
@@ -161,26 +134,26 @@ def predict_rest(restaurant, miles, zipcode):
     df = df.sort('scores', ascending=False).reset_index()
 
     keep = max(20, len(df.ix[df['scores']>0]))
-    keep = min(400, keep)
+    keep = min(100, keep)
     keep = min(keep, len(df))
     print keep
     df = df.ix[range(keep),:]
 
     #Sort by name to keep aligned
     df = df.sort('r1FullName')
-    print len(df)
+
     #Grab reviews from those restaurants. Python sort instead of SQL ORDER BY because of different treatment of capitalized letters
     r1FullNames = '", "'.join(df['r1FullName'].tolist())
-    print 'DEBUG1'
+
     db.cursor.execute('SELECT FullName, Review FROM Restaurant WHERE FullName IN ("' + r1FullNames + '") AND NReviews>0;')
     r1Reviews = db.cursor.fetchall()
     r1Reviews = sorted(r1Reviews)
-    print 'DEBUG2'
+
     db.cursor.execute('SELECT FullName, Review FROM Restaurant WHERE (FullName = "' + restaurant + '");')
     r2Review = db.cursor.fetchone()
-    print "Test"
+
     df = tf_idf(df, r1Reviews, r2Review)[:n_restaurants]
-    print "Test2"
+
     restaurants = []
     for i in range(n_restaurants):
         max_words = df.ix[i, 'max_words']
@@ -193,5 +166,5 @@ def predict_rest(restaurant, miles, zipcode):
     return restaurants
 
 if __name__=='__main__':
-#    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", "San Francisco")
-    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", "Anahiem, Ca")
+    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", "San Francisco")
+#    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", "Anahiem, Ca")
