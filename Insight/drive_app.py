@@ -38,6 +38,8 @@ def restaurant():
 
     try:
         miles = str(int(float(miles)))
+        if miles==0:
+            miles = 1
     except ValueError:
         return json.dumps(["Please enter a number into the miles field"])
 
