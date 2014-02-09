@@ -8,6 +8,7 @@ from pandas import DataFrame
 import pandas
 from sklearn import linear_model
 from sklearn.externals import joblib
+from pygeocoder import Geocoder
 
 import helper
 import sql_database
@@ -39,6 +40,13 @@ def restaurant():
         miles = str(int(float(miles)))
     except ValueError:
         return json.dumps(["Please enter a number into the miles field"])
+
+    try:
+        results = Geocoder.geocode(zipcode)
+    except:
+        return json.dumps(["I couldn't recognize that address. Could you enter another one?"])
+
+    zipcode = results.formatted_address
 
     query = restaurant + " " + miles + " " + zipcode
     sql = ('SELECT Result FROM Cached WHERE Query = "' + query + '";')
