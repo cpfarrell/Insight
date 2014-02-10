@@ -2,6 +2,10 @@ import redis_database
 
 redis_db = redis_database.RedisDatabase()
 
+chicago = [
+"chicago"
+]
+
 tampa = [
 "tampa",
 "soho%2C+tampa",
@@ -161,6 +165,7 @@ def main():
     sf.extend(la)
     sf.extend(ny)
     sf.extend(tampa)
+    sf.extend(chicago)
 
     for neighborhood in neighborhoods:
         redis_db.add_to_group("neighborhoods", neighborhood)
