@@ -47,17 +47,17 @@ while redis_db.num_members("restaurant_to_search") > 0:
         rest = s.get("http://www.yelp.com" + rest_url + "?start=" + str(40*i))
         data_rest = rest.text
         rest_info['yelp_page' + str(i)] = data_rest
-        time.sleep(random.uniform(1,3))
+        time.sleep(random.uniform(5,15))
 
     #Grab the menu if possible as well
-    menu_url_list = [div for div in divs_rest if div.get('class') and div['class']==["yelp-menu"]]
-    if menu_url_list:
-        menu_url = menu_url_list[0].a['href']
+    #menu_url_list = [div for div in divs_rest if div.get('class') and div['class']==["yelp-menu"]]
+    #if menu_url_list:
+    #    menu_url = menu_url_list[0].a['href']
 
-        time.sleep(random.uniform(2,6))
-        menu = s.get('http://www.yelp.com' + menu_url)
-        data_menu = menu.text
-        rest_info['yelp_menu'] = data_menu
+    #    time.sleep(random.uniform(5,15))
+    #    menu = s.get('http://www.yelp.com' + menu_url)
+    #    data_menu = menu.text
+    #    rest_info['yelp_menu'] = data_menu
 
 
     posts.insert(rest_info)
