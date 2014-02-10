@@ -25,6 +25,7 @@ while redis_db.num_members("restaurant_to_search") > 0:
     rest_info = {'restaurant': rest_url}
     data_rest = rest.text
     rest_info['yelp_page'] = data_rest
+    rest_info['added_sql'] = False
 
     soup_rest = BeautifulSoup(data_rest)
     divs_rest = soup_rest.find_all('div')
