@@ -124,7 +124,7 @@ def predict_rest(restaurant, miles, location):
     df = df.sort('scores', ascending=False).reset_index()
 
     keep = max(20, len(df.ix[df['scores']>0]))
-#    keep = min(80, keep)
+    #keep = min(80, keep)
     keep = min(keep, len(df))
     print keep
     df = df.ix[range(keep),:]
@@ -145,7 +145,7 @@ def predict_rest(restaurant, miles, location):
     df = tf_idf(df, r1Reviews, r2Review)[:n_restaurants]
 
     restaurants = []
-    for i in range(n_restaurants):
+    for i in range(min(n_restaurants, len(df))):
         max_words = df.ix[i, 'max_words']
         site = df.ix[i, 'r1Site']
         max_words = add_links(max_words, site)
@@ -156,5 +156,5 @@ def predict_rest(restaurant, miles, location):
     return restaurants
 
 if __name__=='__main__':
-    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", Geocoder.geocode("San Francisco"))
+    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", Geocoder.geocode("Giants stadium"))
 #    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", "Anahiem, Ca")
