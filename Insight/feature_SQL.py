@@ -57,15 +57,10 @@ def get_restaurant(soup):
 
     return "An error has occurred"
 
-def restaurant_in_table(db_sql, full_name):
-    sql = 'SELECT FullName FROM Restaurant WHERE FullName = "' + full_name + '";'
-    db_sql.cursor.execute(sql)
-    return len(db_sql.cursor.fetchall())>0
-
 def main():
     db_mongo = client.yelp_database
     posts = db_mongo.posts
-    rests_info = posts.find()
+
 
     attrs = ['Alcohol', 'HasTV', 'NoiseLevel', 'RestaurantsAttire', 'BusinessAcceptsCreditCards', 'Ambience', 'RestaurantsGoodForGroups', 'Caters', 'WiFi', 'RestaurantsReservations', 'RestaurantsTakeOut', 'GoodForKids', 'WheelchairAccessible', 'RestaurantsTableService', 'OutdoorSeating', 'RestaurantsPriceRange2', 'RestaurantsDelivery', 'GoodForMeal', 'BusinessParking']
 
@@ -82,6 +77,8 @@ def main():
     #db_sql.cursor.execute('CREATE TABLE Restaurant (' + Columns + ');')
 
     count = 0
+    rests_info = posts.find({"added_sql": False})
+
     for rest_info in rests_info:
         if count%100==0:
             print count
@@ -125,12 +122,6 @@ def main():
         state = get_address(spans, "addressRegion")
         zipcode = get_address(spans, "postalCode")
         full_name = name + ' ' + street + ' ' + city + ', ' + state + ' ' + zipcode
-
-        if restaurant_in_table(db_sql, full_name):
-            continue
-
-        print 'Restaurant not found ' + restaurant
-        
 
         picture_url = 'NULL'
         picture_div = [div for div in divs if div.get("class") and len(div.get("class"))>1 and div.get("class")[1]=="biz-photo-box"]
@@ -209,7 +200,7 @@ def main():
             Values += '", "' + new_info[attr]
 
         Values += '");'
-
+        print restaurant
         #Add restaurant to db. If restaurant `with name already in db use the one with more reviews
         try:
             db_sql.cursor.execute(Values)
@@ -225,8 +216,11 @@ def main():
                     db_sql.commit()
                     db_sql.cursor.execute(Values)
 
-        db_sql.commit()
+        db_mongo.posts.update({'restaurant': restaurant}, {"$set": {"added_sql": True}}, True)
+        rest_info['added_sql'] = True
 
+        db_sql.commit()
+        
     db_sql.commit()
     db_sql.close()
 
