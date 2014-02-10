@@ -13,10 +13,10 @@ s = requests.Session()
 
 redis_db = redis_database.RedisDatabase()
 
-pages_per_neighborhood = 10
+pages_per_neighborhood = 500
 
 for neighborhood in redis_db.get_members("neighborhoods"):
-    if neighborhood not in neighborhoods.tampa:
+    if neighborhood not in neighborhoods.chicago:
         continue
     print neighborhood
     print redis_db.num_members(neighborhood)
