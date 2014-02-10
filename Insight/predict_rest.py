@@ -91,19 +91,9 @@ def add_links(max_words, site):
     words_list = ['<a href=http://www.yelp.com' + site + '?q=' + '+'.join(word.split()) + ' target="_blank"><big><big>' + word + '</big></big></a>' for word in words_list]
     return '<br>'.join(words_list)
 
-def predict_rest(restaurant, miles, zipcode):
-    try:
-        results = Geocoder.geocode(zipcode)
-    except:
-        return ["I couldn't recognize that address. Could you enter another one?"]
-
-    latitude = str(results[0].coordinates[0])
-    longitude = str(results[0].coordinates[1])
-
-    try:
-        float(miles)
-    except ValueError:
-        return ["Please enter a number into the miles field"]
+def predict_rest(restaurant, miles, location):
+    latitude = str(location.coordinates[0])
+    longitude = str(location.coordinates[1])
 
     df = pandas.io.sql.read_frame('''
      SELECT r1.Name as r1Name, r1.FullName as r1FullName, r1.RestaurantType as r1Type, r1.Site as r1Site, 
@@ -134,7 +124,7 @@ def predict_rest(restaurant, miles, zipcode):
     df = df.sort('scores', ascending=False).reset_index()
 
     keep = max(20, len(df.ix[df['scores']>0]))
-#    keep = min(100, keep)
+    #keep = min(80, keep)
     keep = min(keep, len(df))
     print keep
     df = df.ix[range(keep),:]
@@ -155,7 +145,7 @@ def predict_rest(restaurant, miles, zipcode):
     df = tf_idf(df, r1Reviews, r2Review)[:n_restaurants]
 
     restaurants = []
-    for i in range(n_restaurants):
+    for i in range(min(n_restaurants, len(df))):
         max_words = df.ix[i, 'max_words']
         site = df.ix[i, 'r1Site']
         max_words = add_links(max_words, site)
@@ -166,5 +156,5 @@ def predict_rest(restaurant, miles, zipcode):
     return restaurants
 
 if __name__=='__main__':
-    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", "San Francisco")
+    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", Geocoder.geocode("Giants stadium"))
 #    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", "Anahiem, Ca")

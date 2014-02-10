@@ -35,18 +35,19 @@ def restaurant():
     restaurant = request.args.get("restaurant", "")
     miles = request.args.get("miles", '')
     zipcode = request.args.get("zipcode", "")
-
     try:
         miles = str(int(float(miles)))
+        if miles=="0":
+            miles = "1"
     except ValueError:
         return json.dumps(["Please enter a number into the miles field"])
 
     try:
-        results = Geocoder.geocode(zipcode)
+        location = Geocoder.geocode(zipcode)
     except:
         return json.dumps(["I couldn't recognize that address. Could you enter another one?"])
 
-    zipcode = results.formatted_address
+    zipcode = location.formatted_address
 
     query = restaurant + " " + miles + " " + zipcode
     sql = ('SELECT Result FROM Cached WHERE Query = "' + query + '";')
@@ -55,7 +56,7 @@ def restaurant():
     if len(results)>0:
         result = ast.literal_eval(results[0][0])
     else:
-        result = predict_rest.predict_rest(restaurant, miles, zipcode)
+        result = predict_rest.predict_rest(restaurant, miles, location)
         sql = ('INSERT INTO Cached (Query, Result) VALUES ("' + query + '", %s);')
         db.cursor.execute(sql, (str(result),))
         db.commit()
@@ -88,5 +89,5 @@ def regularpage(pagename=None):
     return "The page " + pagename + " does not exist"
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=80)
 #    app.run()
