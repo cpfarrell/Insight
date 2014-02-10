@@ -57,6 +57,11 @@ def get_restaurant(soup):
 
     return "An error has occurred"
 
+def restaurant_in_table(db_sql, full_name):
+    sql = 'SELECT FullName FROM Restaurant WHERE FullName = "' + full_name + '";'
+    db_sql.cursor.execute(sql)
+    return len(db_sql.cursor.fetchall())>0
+
 def main():
     db_mongo = client.yelp_database
     posts = db_mongo.posts
@@ -65,22 +70,22 @@ def main():
     attrs = ['Alcohol', 'HasTV', 'NoiseLevel', 'RestaurantsAttire', 'BusinessAcceptsCreditCards', 'Ambience', 'RestaurantsGoodForGroups', 'Caters', 'WiFi', 'RestaurantsReservations', 'RestaurantsTakeOut', 'GoodForKids', 'WheelchairAccessible', 'RestaurantsTableService', 'OutdoorSeating', 'RestaurantsPriceRange2', 'RestaurantsDelivery', 'GoodForMeal', 'BusinessParking']
 
     db_sql = sql_database.DbAccess('INSIGHT', usr='root')
-    db_sql.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
+    #db_sql.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
 
-    Columns = 'ID INTEGER, Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200) NOT NULL PRIMARY KEY, '
-    Columns += 'Phone CHAR(50), Site CHAR(100), PictureUrl CHAR(150), Rating FLOAT, Favorites CHAR(200)'
-    Columns += ', RestaurantType CHAR(200), Latitude FLOAT, Longitude FLOAT, SimilarRest1 CHAR(100), SimilarRest2 CHAR(100), SimilarRest3 CHAR(100), NReviews INT, Review LONGTEXT'
+    #Columns = 'ID INTEGER, Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200) NOT NULL PRIMARY KEY, '
+    #Columns += 'Phone CHAR(50), Site CHAR(100), PictureUrl CHAR(150), Rating FLOAT, Favorites CHAR(200)'
+    #Columns += ', RestaurantType CHAR(200), Latitude FLOAT, Longitude FLOAT, SimilarRest1 CHAR(100), SimilarRest2 CHAR(100), SimilarRest3 CHAR(100), NReviews INT, Review LONGTEXT'
 
-    for attr in attrs:
-        Columns += ', ' + attr + ' CHAR(80)'
+    #for attr in attrs:
+        #Columns += ', ' + attr + ' CHAR(80)'
 
-    db_sql.cursor.execute('CREATE TABLE Restaurant (' + Columns + ');')
+    #db_sql.cursor.execute('CREATE TABLE Restaurant (' + Columns + ');')
 
     count = 0
     for rest_info in rests_info:
         if count%100==0:
             print count
-
+        count+=1
         n_reviews = rest_info['reviews']
 
         if n_reviews < 40:
@@ -120,6 +125,12 @@ def main():
         state = get_address(spans, "addressRegion")
         zipcode = get_address(spans, "postalCode")
         full_name = name + ' ' + street + ' ' + city + ', ' + state + ' ' + zipcode
+
+        if restaurant_in_table(db_sql, full_name):
+            continue
+
+        print 'Restaurant not found ' + restaurant
+        
 
         picture_url = 'NULL'
         picture_div = [div for div in divs if div.get("class") and len(div.get("class"))>1 and div.get("class")[1]=="biz-photo-box"]
@@ -199,11 +210,6 @@ def main():
 
         Values += '");'
 
-        for attr in attrs:
-            Columns += ', ' + attr + ' CHAR(80)'
-
-        Values += ';'
-        
         #Add restaurant to db. If restaurant `with name already in db use the one with more reviews
         try:
             db_sql.cursor.execute(Values)
@@ -220,7 +226,6 @@ def main():
                     db_sql.cursor.execute(Values)
 
         db_sql.commit()
-        count += 1
 
     db_sql.commit()
     db_sql.close()
