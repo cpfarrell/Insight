@@ -111,7 +111,7 @@ def predict_rest(restaurant, miles, location):
         n_rests = len(db.cursor.fetchall())
         
         if n_rests==0:
-            return ["I don't know the restaurant " + restaurant + ". How about using one from autosuggest?"]
+            return ["I don't know the restaurant " + restaurant + ". How about clicking on the new search button and selecting one from auto complete?"]
         else:
             return ["No restaurants were found in this area. Currently OldFaveNewPlace only has restaurants in the SF Bay Area, Los Angeles, and New York City"]
     
@@ -156,5 +156,5 @@ def predict_rest(restaurant, miles, location):
     return restaurants
 
 if __name__=='__main__':
-    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", Geocoder.geocode("Giants stadium"))
-#    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", "Anahiem, Ca")
+#    print predict_rest("Hostaria del Piccolo 606 Broadway Santa Monica, CA 90401", "5", Geocoder.geocode("Giants stadium"))
+    print predict_rest("Animal 435 N Fairfax Ave Los Angeles, CA 90036", "1", Geocoder.geocode("Marina SF"))
