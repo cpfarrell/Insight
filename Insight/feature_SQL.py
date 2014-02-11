@@ -60,27 +60,29 @@ def get_restaurant(soup):
 def main():
     db_mongo = client.yelp_database
     posts = db_mongo.posts
-    rests_info = posts.find()
+
 
     attrs = ['Alcohol', 'HasTV', 'NoiseLevel', 'RestaurantsAttire', 'BusinessAcceptsCreditCards', 'Ambience', 'RestaurantsGoodForGroups', 'Caters', 'WiFi', 'RestaurantsReservations', 'RestaurantsTakeOut', 'GoodForKids', 'WheelchairAccessible', 'RestaurantsTableService', 'OutdoorSeating', 'RestaurantsPriceRange2', 'RestaurantsDelivery', 'GoodForMeal', 'BusinessParking']
 
     db_sql = sql_database.DbAccess('INSIGHT', usr='root')
-    db_sql.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
+    #db_sql.cursor.execute('DROP TABLE IF EXISTS Restaurant;')
 
-    Columns = 'ID INTEGER, Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200) NOT NULL PRIMARY KEY, '
-    Columns += 'Phone CHAR(50), Site CHAR(100), PictureUrl CHAR(150), Rating FLOAT, Favorites CHAR(200)'
-    Columns += ', RestaurantType CHAR(200), Latitude FLOAT, Longitude FLOAT, SimilarRest1 CHAR(100), SimilarRest2 CHAR(100), SimilarRest3 CHAR(100), NReviews INT, Review LONGTEXT'
+    #Columns = 'ID INTEGER, Name CHAR(80), Street CHAR(80), City CHAR(40), State CHAR(10), Zip CHAR(10), FullName CHAR(200) NOT NULL PRIMARY KEY, '
+    #Columns += 'Phone CHAR(50), Site CHAR(100), PictureUrl CHAR(150), Rating FLOAT, Favorites CHAR(200)'
+    #Columns += ', RestaurantType CHAR(200), Latitude FLOAT, Longitude FLOAT, SimilarRest1 CHAR(100), SimilarRest2 CHAR(100), SimilarRest3 CHAR(100), NReviews INT, Review LONGTEXT'
 
-    for attr in attrs:
-        Columns += ', ' + attr + ' CHAR(80)'
+    #for attr in attrs:
+        #Columns += ', ' + attr + ' CHAR(80)'
 
-    db_sql.cursor.execute('CREATE TABLE Restaurant (' + Columns + ');')
+    #db_sql.cursor.execute('CREATE TABLE Restaurant (' + Columns + ');')
 
     count = 0
+    rests_info = posts.find({"added_sql": False})
+
     for rest_info in rests_info:
         if count%100==0:
             print count
-
+        count+=1
         n_reviews = rest_info['reviews']
 
         if n_reviews < 40:
@@ -198,12 +200,7 @@ def main():
             Values += '", "' + new_info[attr]
 
         Values += '");'
-
-        for attr in attrs:
-            Columns += ', ' + attr + ' CHAR(80)'
-
-        Values += ';'
-        
+        print restaurant
         #Add restaurant to db. If restaurant `with name already in db use the one with more reviews
         try:
             db_sql.cursor.execute(Values)
@@ -219,9 +216,11 @@ def main():
                     db_sql.commit()
                     db_sql.cursor.execute(Values)
 
-        db_sql.commit()
-        count += 1
+        db_mongo.posts.update({'restaurant': restaurant}, {"$set": {"added_sql": True}}, True)
+        rest_info['added_sql'] = True
 
+        db_sql.commit()
+        
     db_sql.commit()
     db_sql.close()
 

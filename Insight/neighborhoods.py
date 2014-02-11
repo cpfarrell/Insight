@@ -2,6 +2,29 @@ import redis_database
 
 redis_db = redis_database.RedisDatabase()
 
+chicago = [
+"chicago"
+]
+
+tampa = [
+"tampa",
+"soho%2C+tampa",
+"west+tampa",
+"south+tampa",
+"Carrollwood%2C+Tampa+Bay%2C+FL",
+"Town+N+Country%2C+Tampa+Bay%2C+FL",
+"Temple+Terrace%2C+Tampa+Bay%2C+FL",
+"Downtown+Tampa%2C+Tampa+Bay%2C+FL",
+"Ybor+City%2C+Tampa+Bay%2C+FL",
+"Brandon%2C+Tampa+Bay%2C+FL",
+"st+pete%2C+fl",
+"St+Pete+Beach%2C+Tampa+Bay%2C+FL",
+"Largo%2C+Tampa+Bay%2C+FL",
+"Clearwater%2C+Tampa+Bay%2C+FL",
+"Clearwater+Beach%2C+Tampa+Bay%2C+FL",
+"Palm+Harbor%2C+Tampa+Bay%2C+FL"
+]
+
 ny = [
 "Manhattan%2C+NY",
 "Brooklyn%2C+NY",
@@ -141,6 +164,8 @@ def main():
     sf.extend(bayarea)
     sf.extend(la)
     sf.extend(ny)
+    sf.extend(tampa)
+    sf.extend(chicago)
 
     for neighborhood in neighborhoods:
         redis_db.add_to_group("neighborhoods", neighborhood)

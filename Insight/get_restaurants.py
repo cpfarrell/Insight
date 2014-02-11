@@ -13,10 +13,10 @@ s = requests.Session()
 
 redis_db = redis_database.RedisDatabase()
 
-pages_per_neighborhood = 100
+pages_per_neighborhood = 500
 
 for neighborhood in redis_db.get_members("neighborhoods"):
-    if neighborhood not in neighborhoods.ny:
+    if neighborhood not in neighborhoods.chicago:
         continue
     print neighborhood
     print redis_db.num_members(neighborhood)
@@ -50,5 +50,5 @@ for neighborhood in redis_db.get_members("neighborhoods"):
                 rest_info["neighborhoods"] = all_neighborhoods
                 redis_db.add_info(restaurant, rest_info)
         
-            time.sleep(random.uniform(5,10))
+            time.sleep(random.uniform(20,30))
 
