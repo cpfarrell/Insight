@@ -6,6 +6,14 @@ chicago = [
 "chicago"
 ]
 
+boston = [
+"boston"
+]
+
+philadelphia = [
+"philadelphia"
+]
+
 tampa = [
 "tampa",
 "soho%2C+tampa",
@@ -166,6 +174,8 @@ def main():
     sf.extend(ny)
     sf.extend(tampa)
     sf.extend(chicago)
+    sf.extend(boston)
+    sf.extend(philadelphia)
 
     for neighborhood in neighborhoods:
         redis_db.add_to_group("neighborhoods", neighborhood)

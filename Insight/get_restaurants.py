@@ -16,7 +16,7 @@ redis_db = redis_database.RedisDatabase()
 pages_per_neighborhood = 500
 
 for neighborhood in redis_db.get_members("neighborhoods"):
-    if neighborhood not in neighborhoods.chicago:
+    if neighborhood not in neighborhoods.boston and neighborhood not in neighborhoods.philadelphia:
         continue
     print neighborhood
     print redis_db.num_members(neighborhood)
