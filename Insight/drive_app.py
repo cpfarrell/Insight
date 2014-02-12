@@ -63,14 +63,12 @@ def restaurant():
 
     return json.dumps(result)
 
+#Get list of restaurants for typeahead
 def list_restaurants():
     q = request.args.get('q')
-    # This is my query to find cities, countries matching query
     sql = ('SELECT FullName FROM Restaurant WHERE FullName LIKE "{0}%" OR FullName LIKE "the {0}%" LIMIT 10').format(q)
     db.cursor.execute(sql)
-    # Matching cities are in a list
     restaurants = [restaurant[0] for restaurant in db.cursor.fetchall()]
-    # Python list is converted to JSON string
     return json.dumps(restaurants)
 
 funcs = {
